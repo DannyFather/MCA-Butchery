@@ -1,0 +1,52 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+#issueTrackerURL = ""
+license = "Creative Commons (CC)"
+
+[[mods]]
+modId = "mca_butchery"
+version = "${version}"
+displayName = "MCA: Butchery"
+authors = "DannyFather"
+description = '''
+Adds Minecraft Comes Alive: Reborn compatibility with Butchery, Now you can Butcher MCA Villagers!
+'''
+#logoFile = ""
+
+[[dependencies.mca_butchery]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.mca_butchery]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.mca_butchery]]
+modId = "architectury"
+type = "required"
+versionRange = "[13.0.11,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.mca_butchery]]
+modId = "mca"
+type = "required"
+versionRange = "[7.7.7,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.mca_butchery]]
+modId = "butchery"
+type = "required"
+versionRange = "[5.2,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[mixins]]
+config = "mca_butchery.mixins.json"

@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "mca_butchery:drained_villager_corpse",
+    "mca_butchery:villager_corpse"
+  ]
+}

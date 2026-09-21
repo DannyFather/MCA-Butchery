@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" factoryName="Application" name="Minecraft Client (:fabric)" type="Application">
+    <option name="MAIN_CLASS_NAME" value="dev.architectury.transformer.TransformerRuntime"/>
+    <module name="mca_butchery.fabric.main"/>
+    <option name="PROGRAM_PARAMETERS" value=""/>
+    <option name="VM_PARAMETERS" value="-Darchitectury.main.class=C:\Users\Dan\Desktop\mca_butchery-1.21.1-fabric-neoforge-template\fabric\.gradle\architectury\.main_class -Darchitectury.runtime.transformer=C:\Users\Dan\Desktop\mca_butchery-1.21.1-fabric-neoforge-template\fabric\.gradle\architectury\.transforms -Darchitectury.properties=C:\Users\Dan\Desktop\mca_butchery-1.21.1-fabric-neoforge-template\fabric\.gradle\architectury\.properties -Djdk.attach.allowAttachSelf=true -javaagent:C:\Users\Dan\Desktop\mca_butchery-1.21.1-fabric-neoforge-template\.gradle\architectury\architectury-transformer-agent.jar -Dfabric.dli.config=C:\Users\Dan\Desktop\mca_butchery-1.21.1-fabric-neoforge-template\.gradle\loom-cache\projects\fabric\launch.cfg -Dfabric.dli.env=client -Dfabric.dli.main=net.fabricmc.loader.impl.launch.knot.KnotClient -XX:StackShadowPages=32"/>
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/fabric\run/"/>
+    <method v="2">
+      <option enabled="true" name="Make"/>
+    </method>
+    <envs>
+
+    </envs>
+    <shortenClasspath name="ARGS_FILE"/>
+  <classpathModifications/></configuration>
+</component>
