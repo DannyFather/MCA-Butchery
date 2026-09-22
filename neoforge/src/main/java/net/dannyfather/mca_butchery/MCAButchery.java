@@ -10,12 +10,19 @@ import net.dannyfather.mca_butchery.block.entity.models.OrgansandBonesHangingMod
 import net.dannyfather.mca_butchery.block.entity.renderer.DrainedMCAVillagercorpseBlockEntityRenderer;
 import net.dannyfather.mca_butchery.block.entity.renderer.MCAVillagerHeadBlockEntityRenderer;
 import net.dannyfather.mca_butchery.block.entity.renderer.MCAVillagerCorpseBlockEntityRenderer;
-import net.dannyfather.mca_butchery.client.DrainedMCAVillagerCorpseItemRenderer;
-import net.dannyfather.mca_butchery.client.MCAButcheryClientBlockExtensions;
-import net.dannyfather.mca_butchery.client.MCAVillagerHeadItemRenderer;
+import net.dannyfather.mca_butchery.client.*;
 import net.dannyfather.mca_butchery.item.MCAButcheryItems;
-import net.dannyfather.mca_butchery.client.MCAVillagerCorpseItemRenderer;
 import net.mcreator.butchery.configuration.ButcheryconfigConfiguration;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.entity.ArmorStandRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -100,6 +107,7 @@ public class MCAButchery {
                     MCAButcheryBlockEntities.MCAVILLAGERHEAD.get(),
                     MCAVillagerHeadBlockEntityRenderer::new
             );
+
         }
 
 
@@ -153,6 +161,15 @@ public class MCAButchery {
 
                             return headItemRenderer;
                         }
+
+                        @Override
+                        public HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity,ItemStack itemStack,EquipmentSlot equipmentSlot,HumanoidModel<?> original) {
+                            if (equipmentSlot == EquipmentSlot.HEAD) {
+                                original.head.visible = false;
+                            }
+
+                            return original;
+                        }
                     },
                     MCAButcheryItems.MCAVILLAGERHEAD.get()
             );
@@ -162,5 +179,31 @@ public class MCAButchery {
             event.registerBlock(new MCAButcheryClientBlockExtensions(),MCAButcheryBlocks.MCAVILLAGERHEAD.get());
 
         }
+
+
+        @SubscribeEvent
+        public static void addPlayerLayers(EntityRenderersEvent.AddLayers event) {
+            for (var skin : event.getSkins()) {
+                if (event.getSkin(skin) instanceof PlayerRenderer playerRenderer) {
+
+                    playerRenderer.addLayer(new MCAVillagerHeadHelmetRenderer(playerRenderer,createHeadModel(event)));
+                }
+            }
+
+            if (event.getRenderer(EntityType.ARMOR_STAND) instanceof ArmorStandRenderer armorStandRenderer) {
+                armorStandRenderer.addLayer(new MCAVillagerHeadArmorStandRenderer(armorStandRenderer,createHeadModel(event)));
+            }
+        }
+
+        private static <T extends Entity> MCAVillagerHeadModel<T> createHeadModel(
+                EntityRenderersEvent.AddLayers event) {
+
+            return new MCAVillagerHeadModel<>(
+                    event.getEntityModels().bakeLayer(
+                            MCAVillagerHeadModel.LAYER_LOCATION
+                    )
+            );
+        }
     }
+
 }

@@ -3,6 +3,7 @@ package net.dannyfather.mca_butchery.item;
 import com.mojang.serialization.Codec;
 import net.dannyfather.mca_butchery.MCAButchery;
 import net.dannyfather.mca_butchery.block.MCAButcheryBlocks;
+import net.dannyfather.mca_butchery.block.MCAVillagerHeadBlock;
 import net.dannyfather.mca_butchery.client.MCAVillagerCorpseItemRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -30,18 +31,16 @@ import java.util.UUID;
 
 public class MCAButcheryItems {
     public static final DeferredRegister.Items REGISTRY = DeferredRegister.createItems(MCAButchery.MOD_ID);
-    public static final DeferredItem<Item> MCAVILLAGERCORPSE = block(MCAButcheryBlocks.MCAVILLAGERCORPSE, new Item.Properties().stacksTo(16));
-    public static final DeferredItem<Item> DRAINEDMCAVILLAGERCORPSE = block(MCAButcheryBlocks.DRAINEDMCAVILLAGERCORPSE, new Item.Properties().stacksTo(16));
-    public static final DeferredItem<Item> MCAVILLAGERHEAD = block(MCAButcheryBlocks.MCAVILLAGERHEAD, new Item.Properties());
-
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(Registries.ITEM, MCAButchery.MOD_ID);
 
+    public static final DeferredItem<Item> MCAVILLAGERCORPSE = block(MCAButcheryBlocks.MCAVILLAGERCORPSE, new Item.Properties().stacksTo(16));
+    public static final DeferredItem<Item> DRAINEDMCAVILLAGERCORPSE = block(MCAButcheryBlocks.DRAINEDMCAVILLAGERCORPSE, new Item.Properties().stacksTo(16));
+    public static final DeferredItem<Item> MCAVILLAGERHEAD = REGISTRY.register("villager_head",
+            () -> new MCAVillagerHeadItem(MCAButcheryBlocks.MCAVILLAGERHEAD.get(), new Item.Properties()));
+
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS =
-            DeferredRegister.create(
-                    Registries.DATA_COMPONENT_TYPE,
-                    MCAButchery.MOD_ID
-            );
+            DeferredRegister.create(Registries.DATA_COMPONENT_TYPE,MCAButchery.MOD_ID);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<UUID>> VILLAGER_UUID =
             DATA_COMPONENTS.register("villager_uuid",
