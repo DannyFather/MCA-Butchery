@@ -35,6 +35,10 @@ public class MCAVillagerHeadItemRenderer extends BlockEntityWithoutLevelRenderer
             this.model = new MCAVillagerHeadModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(MCAVillagerHeadModel.LAYER_LOCATION));
         }
 
+        if (displayContext == ItemDisplayContext.HEAD) {
+            return;
+        }
+
         UUID villager = stack.get(MCAButcheryItems.VILLAGER_UUID);
 
         poseStack.pushPose();
@@ -70,6 +74,7 @@ public class MCAVillagerHeadItemRenderer extends BlockEntityWithoutLevelRenderer
                 poseStack.mulPose(Axis.YP.rotationDegrees(180f));
                 poseStack.translate(-0.5f,0.25f,-0.5f);
             }
+
 
          }
 
