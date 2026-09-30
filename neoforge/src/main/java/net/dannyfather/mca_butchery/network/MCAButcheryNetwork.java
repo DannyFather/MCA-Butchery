@@ -50,6 +50,18 @@ public class MCAButcheryNetwork {
                 VillagerSkinPayload.STREAM_CODEC,
                 MCAButcheryNetwork::handleVillagerSkin
         );
+
+        registrar.playToClient(
+                DownloadVillagerSkinPayload.TYPE,
+                DownloadVillagerSkinPayload.STREAM_CODEC,
+                MCAButcheryNetwork::handleSkinDownload
+        );
+    }
+
+    private static void handleSkinDownload(DownloadVillagerSkinPayload payload, IPayloadContext context) {
+        context.enqueueWork(()->{
+
+        });
     }
 
     private static void handleSkinRequest(RequestVillagerSkinPayload payload, IPayloadContext context) {

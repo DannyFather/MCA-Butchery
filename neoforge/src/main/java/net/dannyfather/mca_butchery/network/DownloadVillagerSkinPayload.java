@@ -10,16 +10,14 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.UUID;
 
-public record DownloadVillagerSkinPayload(byte[] data, UUID villager) implements CustomPacketPayload {
-    public static final Type<UploadVillagerSkinPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID,"villager_skin_upload"));
+public record DownloadVillagerSkinPayload(int entityId) implements CustomPacketPayload {
+    public static final Type<DownloadVillagerSkinPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID,"villager_skin_download"));
 
-    public static final StreamCodec<ByteBuf, UploadVillagerSkinPayload> STREAM_CODEC =
+    public static final StreamCodec<ByteBuf, DownloadVillagerSkinPayload> STREAM_CODEC =
             StreamCodec.composite(
-                    ByteBufCodecs.BYTE_ARRAY,
-                    UploadVillagerSkinPayload::data,
-                    UUIDUtil.STREAM_CODEC,
-                    UploadVillagerSkinPayload::villager,
-                    UploadVillagerSkinPayload::new
+                    ByteBufCodecs.INT,
+                    DownloadVillagerSkinPayload::entityId,
+                    DownloadVillagerSkinPayload::new
             );
 
     @Override

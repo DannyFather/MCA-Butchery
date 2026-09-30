@@ -56,6 +56,12 @@ public class MCAButcheryClientNetwork {
                 VillagerSkinPayload.STREAM_CODEC,
                 MCAButcheryClientNetwork::handleVillagerSkin
         );
+
+        registrar.playToClient(
+                DownloadVillagerSkinPayload.TYPE,
+                DownloadVillagerSkinPayload.STREAM_CODEC,
+                MCAButcheryClientNetwork::handleSkinDownload
+        );
     }
 
     public static void handleSkinRequest(RequestVillagerSkinPayload payload, IPayloadContext context) {
@@ -66,6 +72,25 @@ public class MCAButcheryClientNetwork {
 
         });
     }
+
+    private static void handleSkinDownload(DownloadVillagerSkinPayload payload, IPayloadContext context) {
+        context.enqueueWork(()->{
+            ClientLevel level = Minecraft.getInstance().level;
+            if(level != null) {
+                Entity entity = level.getEntity(payload.entityId());
+                if(entity instanceof VillagerEntityMCA villagerEntityMCA) {
+                    String clothesVariant = villagerEntityMCA.isBurned() ? "burned" : "normal";
+                    try (NativeImage image = SkinExporter.createSkin(villagerEntityMCA,clothesVariant)){
+                        byte[] data = image.asByteArray();
+                        PacketDistributor.sendToServer(new UploadVillagerSkinPayload(data, villagerEntityMCA.getUUID()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+    }
+
     private static void handleVillagerSkin(VillagerSkinPayload payload,IPayloadContext context) {
         context.enqueueWork(() -> {
             try {

@@ -13,6 +13,7 @@ import net.dannyfather.mca_butchery.block.entity.MCAVillagerCorpseBlockEntity;
 import net.dannyfather.mca_butchery.client.ClientSkinCache;
 import net.dannyfather.mca_butchery.client.CorpseTexture;
 import net.dannyfather.mca_butchery.item.MCAButcheryItems;
+import net.dannyfather.mca_butchery.network.DownloadVillagerSkinPayload;
 import net.dannyfather.mca_butchery.network.MCAButcheryNetwork;
 import net.dannyfather.mca_butchery.network.RequestVillagerSkinPayload;
 import net.dannyfather.mca_butchery.network.UploadVillagerSkinPayload;
@@ -65,10 +66,13 @@ public class MCAButcheryEvents {
             if (entity.level() instanceof ServerLevel serverLevel) {
                 if (weapon.is(ItemTags.create(ResourceLocation.parse("c:cleaver")))) {
                     if (entity instanceof VillagerEntityMCA villagerEntityMCA && !villagerEntityMCA.isBaby()) {
-                        if(!(livingEntity instanceof ServerPlayer)) {
+                        int entityId = villagerEntityMCA.getId();
+                        if(livingEntity instanceof ServerPlayer serverPlayer) {
+                            PacketDistributor.sendToPlayer(serverPlayer, new DownloadVillagerSkinPayload(entityId));
+                        } else {
                             ServerPlayer player = serverLevel.getRandomPlayer();
                             if (player != null) {
-                                player.attack(villagerEntityMCA);
+                                PacketDistributor.sendToPlayer(player,new DownloadVillagerSkinPayload(entityId));
                             }
                         }
 
