@@ -8,6 +8,7 @@ import net.dannyfather.mca_butchery.block.MCAVillagerHeadBlock;
 import net.dannyfather.mca_butchery.block.entity.MCAVillagerHeadBlockEntity;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerHeadModel;
 import net.dannyfather.mca_butchery.client.ClientSkinCache;
+import net.dannyfather.mca_butchery.network.MCAButcheryClientNetwork;
 import net.dannyfather.mca_butchery.network.MCAButcheryNetwork;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;

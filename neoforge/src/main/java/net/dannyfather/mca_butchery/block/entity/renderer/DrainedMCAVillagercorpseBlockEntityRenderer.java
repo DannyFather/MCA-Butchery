@@ -12,6 +12,7 @@ import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModel;
 import net.dannyfather.mca_butchery.block.entity.models.OrgansandBonesHangingModel;
 import net.dannyfather.mca_butchery.client.ClientSkinCache;
 import net.dannyfather.mca_butchery.client.CorpseTexture;
+import net.dannyfather.mca_butchery.network.MCAButcheryClientNetwork;
 import net.dannyfather.mca_butchery.network.MCAButcheryNetwork;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -104,9 +105,9 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
 
 
 
-        CorpseTexture drainedTexture = new CorpseTexture("corpse_drained",chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,false,true);
-        CorpseTexture bloodyTexture = new CorpseTexture("corpse_bloody",chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,true,true);
-        CorpseTexture cutOpenTexture = new CorpseTexture("corpse_cut_open",chosenSkin,cutOpenBlood,cutOpenMask,cutOpenBloodMask,true,true);
+        CorpseTexture drainedTexture = new CorpseTexture("corpse_drained_" + villager,chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,false,true);
+        CorpseTexture bloodyTexture = new CorpseTexture("corpse_bloody_" + villager,chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,true,true);
+        CorpseTexture cutOpenTexture = new CorpseTexture("corpse_cut_open_"+ villager ,chosenSkin,cutOpenBlood,cutOpenMask,cutOpenBloodMask,true,true);
 
         organsandBonesHangingModel.setVisibleParts(state);
         model.setVisibleParts(state);
@@ -118,12 +119,16 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
                 VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(drainedTexture.getLocation()));
                 model.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
                 poseStack.popPose();
+                poseStack.pushPose();
+                poseStack.popPose();
             }
 
             case 1-> {
                 poseStack.translate(0f,0.006f,0.0075f);
                 VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(drainedTexture.getLocation()));
                 hangingModel.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+                poseStack.popPose();
+                poseStack.pushPose();
                 poseStack.popPose();
             }
 

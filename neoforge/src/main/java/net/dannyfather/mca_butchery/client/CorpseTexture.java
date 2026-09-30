@@ -1,10 +1,24 @@
 package net.dannyfather.mca_butchery.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import net.conczin.mca.MCA;
+import net.conczin.mca.client.resources.SkinExporter;
+import net.conczin.mca.entity.VillagerEntityMCA;
 import net.dannyfather.mca_butchery.MCAButchery;
+import net.dannyfather.mca_butchery.network.UploadVillagerSkinPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.storage.LevelResource;
+import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 public class CorpseTexture {
 
@@ -43,6 +57,7 @@ public class CorpseTexture {
         this.location = ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "dynamic/" + name);
 
         this.dynamicTexture = new DynamicTexture(result);
+
 
         Minecraft.getInstance().getTextureManager().register(location, dynamicTexture);
     }
@@ -91,5 +106,10 @@ public class CorpseTexture {
     public void close() {
         dynamicTexture.close();
     }
+
+
+
+
+
 }
 

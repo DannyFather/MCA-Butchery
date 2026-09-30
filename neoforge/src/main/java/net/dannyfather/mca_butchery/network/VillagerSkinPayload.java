@@ -13,7 +13,13 @@ import java.util.UUID;
 public record VillagerSkinPayload(UUID uuid, byte[] data) implements CustomPacketPayload {
     public static final Type<VillagerSkinPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID,"villager_skin"));
 
-    public static final StreamCodec<ByteBuf, VillagerSkinPayload> STREAM_CODEC = StreamCodec.composite(UUIDUtil.STREAM_CODEC, VillagerSkinPayload::uuid, ByteBufCodecs.BYTE_ARRAY,VillagerSkinPayload::data,VillagerSkinPayload::new);
+    public static final StreamCodec<ByteBuf, VillagerSkinPayload> STREAM_CODEC = StreamCodec.composite(
+            UUIDUtil.STREAM_CODEC,
+            VillagerSkinPayload::uuid,
+            ByteBufCodecs.BYTE_ARRAY,
+            VillagerSkinPayload::data,
+            VillagerSkinPayload::new
+    );
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
