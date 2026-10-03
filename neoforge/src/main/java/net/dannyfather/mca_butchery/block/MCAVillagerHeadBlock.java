@@ -93,7 +93,7 @@ public class MCAVillagerHeadBlock extends Block implements EntityBlock {
         int rotation = Mth.floor((yaw + 11.25f)/22.5f) & 15;
 
         return super.getStateForPlacement(context)
-                .setValue(FACING, context.getHorizontalDirection().getOpposite())
+                .setValue(FACING, clickedFace.getAxis().isHorizontal() ? clickedFace : Direction.NORTH)
                 .setValue(BLOCKSTATE, clickedFace.getAxis().isHorizontal() ? 1 : 0)
                 .setValue(ROTATION, rotation);
     }
@@ -119,6 +119,8 @@ public class MCAVillagerHeadBlock extends Block implements EntityBlock {
             if (blockEntity instanceof MCAVillagerHeadBlockEntity head && !entity.getAbilities().instabuild) {
                 UUID villager = head.getVillager();
                 String itemName = head.getItemName();
+                Float hSize = head.getHeight();
+                Float wSize = head.getWidth();
                 if (itemName == null) {
                     itemName = Component.translatable("block.mca_butchery.villager_head").getString();
                 }
@@ -126,6 +128,12 @@ public class MCAVillagerHeadBlock extends Block implements EntityBlock {
                     MCAVillagerHeadBlockEntity headBE = new MCAVillagerHeadBlockEntity(pos, blockstate);
                     if (villager != null){headBE.setVillager(villager);}
                     headBE.setItemName(itemName);
+                    if(hSize != null) {
+                        headBE.setHeight(hSize);
+                    }
+                    if(wSize != null) {
+                        headBE.setWidth(wSize);
+                    }
                     ItemStack item = headBE.toItemStack();
                     Containers.dropItemStack(_level, pos.getX(), pos.getY(), pos.getZ(), item);
                 }
@@ -150,6 +158,8 @@ public class MCAVillagerHeadBlock extends Block implements EntityBlock {
             if (blockEntity instanceof MCAVillagerHeadBlockEntity head) {
                 UUID uuid = stack.get(MCAButcheryItems.VILLAGER_UUID);
                 Component itemComponent = stack.get(DataComponents.CUSTOM_NAME);
+                Float hSize = stack.get(MCAButcheryItems.H_SIZE);
+                Float wSize = stack.get(MCAButcheryItems.W_SIZE);
 
                 if (uuid != null) {
                     head.setVillager(uuid);
@@ -157,6 +167,13 @@ public class MCAVillagerHeadBlock extends Block implements EntityBlock {
                 if (itemComponent != null) {
                     head.setItemName(itemComponent.getString());
                 }
+                if(hSize != null) {
+                    head.setHeight(hSize);
+                }
+                if(wSize != null) {
+                    head.setWidth(wSize);
+                }
+
             }
         }
     }

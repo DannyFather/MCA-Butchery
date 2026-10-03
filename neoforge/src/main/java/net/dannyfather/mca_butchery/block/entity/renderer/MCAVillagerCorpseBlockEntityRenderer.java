@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import net.dannyfather.mca_butchery.MCAButchery;
 import net.dannyfather.mca_butchery.block.MCAVillagerCorpseBlock;
 import net.dannyfather.mca_butchery.block.entity.MCAVillagerCorpseBlockEntity;
+import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerBoobsModel;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseHangingModel;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModel;
 import net.dannyfather.mca_butchery.client.ClientSkinCache;
@@ -24,11 +25,13 @@ public class MCAVillagerCorpseBlockEntityRenderer implements BlockEntityRenderer
 
     private final MCAVillagerCorpseModel model;
     private final MCAVillagerCorpseHangingModel hangingModel;
+    private final MCAVillagerBoobsModel boobsModel;
     private static final ResourceLocation DEFAULT_TEXTURE = ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "textures/entity/villager_corpse.png");
 
     public MCAVillagerCorpseBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         this.model = new MCAVillagerCorpseModel(context.bakeLayer(MCAVillagerCorpseModel.LAYER_LOCATION));
         this.hangingModel = new MCAVillagerCorpseHangingModel<>(context.bakeLayer(MCAVillagerCorpseHangingModel.LAYER_LOCATION));
+        this.boobsModel = new MCAVillagerBoobsModel<>(context.bakeLayer(MCAVillagerBoobsModel.LAYER_LOCATION));
     }
 
     @Override
@@ -37,15 +40,18 @@ public class MCAVillagerCorpseBlockEntityRenderer implements BlockEntityRenderer
         Direction facing = blockEntity.getBlockState().getValue(MCAVillagerCorpseBlock.FACING);
         int state = blockEntity.getBlockState().getValue(MCAVillagerCorpseBlock.BLOCKSTATE);
         UUID villager = blockEntity.getVillager();
+        Float bSize = blockEntity.getBSize();
+        Float hSize = blockEntity.getHeight();
+        Float wSize = blockEntity.getWidth();
 
 
         poseStack.pushPose();
 
-        poseStack.translate(0.5F, 0.0F, 0.5F);
+        poseStack.translate(0.5F, 0.5F, 0.5F);
 
         poseStack.mulPose( Axis.YP.rotationDegrees(-facing.toYRot()) );
 
-        poseStack.translate(-0.5F, 0.0F, -0.5F);
+        poseStack.translate(-0.5F, -0.5F, -0.5F);
 
 
         VertexConsumer vertexConsumer;
@@ -65,23 +71,42 @@ public class MCAVillagerCorpseBlockEntityRenderer implements BlockEntityRenderer
             vertexConsumer  = bufferSource.getBuffer(RenderType.entityCutout(DEFAULT_TEXTURE));
         }
 
+        boobsModel.setVisible(bSize > 0);
+
 
         switch (state) {
             case 0 -> {
+                poseStack.translate(0.5F, 0F, 0.25F * wSize);
+                poseStack.scale(wSize,hSize,wSize);
+                poseStack.translate(-0.5F, 0F, -0.25F * wSize);
                 poseStack.translate(0f,0.006f,-0.0234f);
                 model.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+                poseStack.translate(0.5F, 0.8F, 0.5F);
+                poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
+                poseStack.translate(-0.5f, -0.98F, -0.5f);
+                poseStack.translate(0f,0f, - 0.38f + (0.24f * bSize));
+                boobsModel.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
             }
 
             case 1 -> {
+                poseStack.translate(0.5F, 0.7F, 0.5F);
+                poseStack.scale(wSize,hSize,wSize);
+                poseStack.translate(-0.5F, -0.7F, -0.5F);
                 poseStack.translate(0f,0.006f,0.0075f);
                 hangingModel.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+                poseStack.translate(0.5F, 1F, 0.5F);
+                poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
+                poseStack.translate(-0.5f, -1F, -0.49f);
+                boobsModel.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
             }
         }
+
 
 
         poseStack.popPose();
 
     }
+
 
 
 }

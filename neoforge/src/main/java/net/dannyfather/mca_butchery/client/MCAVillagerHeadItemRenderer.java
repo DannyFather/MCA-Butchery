@@ -40,6 +40,8 @@ public class MCAVillagerHeadItemRenderer extends BlockEntityWithoutLevelRenderer
         }
 
         UUID villager = stack.get(MCAButcheryItems.VILLAGER_UUID);
+        Float hSize = stack.get(MCAButcheryItems.H_SIZE);
+        Float wSize = stack.get(MCAButcheryItems.W_SIZE);
 
         poseStack.pushPose();
 
@@ -93,6 +95,12 @@ public class MCAVillagerHeadItemRenderer extends BlockEntityWithoutLevelRenderer
             vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(texture));
         } else {
             vertexConsumer  = bufferSource.getBuffer(RenderType.entityCutout(DEFAULT_TEXTURE));
+        }
+
+        if(hSize != null && wSize != null) {
+            poseStack.translate(0.5F, 0F, 0.5F);
+            poseStack.scale(wSize,hSize,wSize);
+            poseStack.translate(-0.5F, 0F, -0.5F);
         }
 
         this.model.renderToBuffer(poseStack,vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);

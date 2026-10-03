@@ -42,7 +42,7 @@ public class MCAButcheryClientBlockExtensions implements IClientBlockExtensions 
         BlockState particleState = Blocks.NETHER_WART_BLOCK.defaultBlockState();
 
         RandomSource random = level.getRandom();
-        BlockPos pos = new BlockPos((int) target.getLocation().x,(int) target.getLocation().y,(int) target.getLocation().z - 1);
+        BlockPos pos = new BlockPos((int) target.getLocation().x-1,(int) target.getLocation().y,(int) target.getLocation().z-1);
 
         for (int i = 0; i < 2; i++) {
             double scale = 0.0002;

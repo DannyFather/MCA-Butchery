@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.dannyfather.mca_butchery.MCAButchery;
+import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerBoobsModel;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModel;
 import net.dannyfather.mca_butchery.item.MCAButcheryItems;
 import net.dannyfather.mca_butchery.network.MCAButcheryNetwork;
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class DrainedMCAVillagerCorpseItemRenderer extends BlockEntityWithoutLevelRenderer {
 
     private MCAVillagerCorpseModel<?> model;
+    private MCAVillagerBoobsModel<?> bModel;
 
     private static final ResourceLocation DEFAULT_TEXTURE = ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "textures/entity/villager_corpse.png");
 
@@ -36,9 +38,13 @@ public class DrainedMCAVillagerCorpseItemRenderer extends BlockEntityWithoutLeve
     public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         if (this.model == null) {
             this.model = new MCAVillagerCorpseModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(MCAVillagerCorpseModel.LAYER_LOCATION));
+            this.bModel = new MCAVillagerBoobsModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(MCAVillagerBoobsModel.LAYER_LOCATION));
         }
 
         UUID villager = stack.get(MCAButcheryItems.VILLAGER_UUID);
+        Float bSize = stack.get(MCAButcheryItems.B_SIZE);
+        Float hSize = stack.get(MCAButcheryItems.H_SIZE);
+        Float wSize = stack.get(MCAButcheryItems.W_SIZE);
 
         poseStack.pushPose();
 
@@ -119,7 +125,22 @@ public class DrainedMCAVillagerCorpseItemRenderer extends BlockEntityWithoutLeve
 
         poseStack.translate(0f,0.006f,-0.0234f);
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(drainedTexture.getLocation()));
+
+        if(hSize != null && wSize != null) {
+            poseStack.translate(0.5F, 0F, 0.25F * wSize);
+            poseStack.scale(wSize,hSize,wSize);
+            poseStack.translate(-0.5F, 0F, -0.25F * wSize);
+        }
+
         model.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+        if(bSize != null) {
+            this.bModel.setVisible(bSize > 0);
+            poseStack.translate(0.5F, 0.8F, 0.5F);
+            poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
+            poseStack.translate(-0.5f, -0.98F, -0.5f);
+            poseStack.translate(0f,0f, - 0.38f + (0.24f * bSize));
+            bModel.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
+        }
         poseStack.popPose();
     }
 }

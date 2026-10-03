@@ -3,10 +3,7 @@ package net.dannyfather.mca_butchery;
 import com.mojang.logging.LogUtils;
 import net.dannyfather.mca_butchery.block.MCAButcheryBlocks;
 import net.dannyfather.mca_butchery.block.entity.MCAButcheryBlockEntities;
-import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseHangingModel;
-import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModel;
-import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerHeadModel;
-import net.dannyfather.mca_butchery.block.entity.models.OrgansandBonesHangingModel;
+import net.dannyfather.mca_butchery.block.entity.models.*;
 import net.dannyfather.mca_butchery.block.entity.renderer.DrainedMCAVillagercorpseBlockEntityRenderer;
 import net.dannyfather.mca_butchery.block.entity.renderer.MCAVillagerHeadBlockEntityRenderer;
 import net.dannyfather.mca_butchery.block.entity.renderer.MCAVillagerCorpseBlockEntityRenderer;
@@ -89,6 +86,11 @@ public class MCAButchery {
             event.registerLayerDefinition(
                     MCAVillagerHeadModel.LAYER_LOCATION,
                     MCAVillagerHeadModel::createBodyLayer
+            );
+
+            event.registerLayerDefinition(
+                    MCAVillagerBoobsModel.LAYER_LOCATION,
+                    MCAVillagerBoobsModel::createBodyLayer
             );
         }
 

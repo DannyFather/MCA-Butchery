@@ -47,6 +47,21 @@ public class MCAButcheryItems {
                     () -> DataComponentType.<UUID>builder().persistent(Codec.STRING.xmap(UUID::fromString,UUID::toString)).build()
             );
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Float>> B_SIZE =
+            DATA_COMPONENTS.register("b_size",
+                    () -> DataComponentType.<Float>builder().persistent(Codec.FLOAT).build()
+            );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Float>> H_SIZE =
+            DATA_COMPONENTS.register("h_size",
+                    () -> DataComponentType.<Float>builder().persistent(Codec.FLOAT).build()
+            );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Float>> W_SIZE =
+            DATA_COMPONENTS.register("w_size",
+                    () -> DataComponentType.<Float>builder().persistent(Codec.FLOAT).build()
+            );
+
     private static DeferredItem<Item> block(DeferredHolder<Block, Block> block, Item.Properties properties) {
         return REGISTRY.register(block.getId().getPath(), () -> new BlockItem(block.get(), properties));
     }

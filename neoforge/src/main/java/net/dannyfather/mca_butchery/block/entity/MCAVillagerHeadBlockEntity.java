@@ -9,6 +9,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -25,6 +26,8 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
     private NonNullList<ItemStack> stacks = NonNullList.withSize(9, ItemStack.EMPTY);
     private UUID villagerUUID;
     private String customName;
+    private Float wSize = 1f;
+    private Float hSize = 1f;
 
     public MCAVillagerHeadBlockEntity(BlockPos position, BlockState state) {
         super(MCAButcheryBlockEntities.MCAVILLAGERHEAD.get(), position, state);
@@ -55,9 +58,40 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
 
     public String getItemName() { return this.customName; }
 
+
+    public void setHeight(Float size) {
+        this.hSize = size;
+        setChanged();
+
+        if (this.level != null && !this.level.isClientSide) {
+            this.level.sendBlockUpdated(this.worldPosition,this.getBlockState(),this.getBlockState(),3);
+        }
+    }
+
+    public Float getHeight() {
+        return this.hSize;
+    }
+
+    public void setWidth(Float size) {
+        this.wSize = size;
+        setChanged();
+
+        if (this.level != null && !this.level.isClientSide) {
+            this.level.sendBlockUpdated(this.worldPosition,this.getBlockState(),this.getBlockState(),3);
+        }
+    }
+
+    public Float getWidth() {
+        return this.wSize;
+    }
+
     @Override
     public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookupProvider) {
         super.loadAdditional(compound, lookupProvider);
+        if (!this.tryLoadLootTable(compound))
+            this.stacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
+        ContainerHelper.loadAllItems(compound, this.stacks, lookupProvider);
+
         if (compound.contains("UUID")) {
             this.setVillager(compound.getUUID("UUID"));
         }
@@ -65,11 +99,22 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
         if (compound.contains("CustomName")) {
             this.setItemName(compound.getString("CustomName"));
         }
+
+        if (compound.contains("H_Size")) {
+            this.setHeight(compound.getFloat("H_Size"));
+        }
+
+        if (compound.contains("W_Size")) {
+            this.setWidth(compound.getFloat("W_Size"));
+        }
     }
 
     @Override
     public void saveAdditional(CompoundTag compound, HolderLookup.Provider lookupProvider) {
         super.saveAdditional(compound, lookupProvider);
+        if (!this.trySaveLootTable(compound)) {
+            ContainerHelper.saveAllItems(compound, this.stacks, lookupProvider);
+        }
 
         if (this.getVillager() != null) {
             compound.putUUID("UUID", this.getVillager());
@@ -78,8 +123,15 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
         if (this.getItemName() != null) {
             compound.putString("CustomName", this.getItemName());
         }
-    }
 
+        if(this.getHeight() != null) {
+            compound.putFloat("H_Size", this.getHeight());
+        }
+
+        if(this.getWidth() != null) {
+            compound.putFloat("W_Size", this.getWidth());
+        }
+    }
 
     public ItemStack toItemStack() {
         ItemStack stack = new ItemStack(MCAButcheryItems.MCAVILLAGERHEAD.get());
@@ -90,6 +142,14 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
 
         if(this.getItemName() != null) {
             stack.set(DataComponents.CUSTOM_NAME,Component.literal(this.getItemName()).withStyle(style -> style.withItalic(false)));
+        }
+
+        if(this.getHeight() != null) {
+            stack.set(MCAButcheryItems.H_SIZE, this.getHeight());
+        }
+
+        if(this.getWidth() != null) {
+            stack.set(MCAButcheryItems.W_SIZE, this.getWidth());
         }
 
         return stack;

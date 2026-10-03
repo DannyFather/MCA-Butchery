@@ -190,6 +190,9 @@ public class PlacemcavillagercorpseProcedure {
                         if(corpseStack != null) {
                             UUID uuid = corpseStack.get(MCAButcheryItems.VILLAGER_UUID);
                             Component itemComponent = corpseStack.get(DataComponents.CUSTOM_NAME);
+                            Float bSize = corpseStack.get(MCAButcheryItems.B_SIZE);
+                            Float hSize = corpseStack.get(MCAButcheryItems.H_SIZE);
+                            Float wSize = corpseStack.get(MCAButcheryItems.W_SIZE);
 
                             if (uuid != null) {
                                 corpse.setVillager(uuid);
@@ -197,6 +200,18 @@ public class PlacemcavillagercorpseProcedure {
 
                             if (itemComponent != null) {
                                 corpse.setItemName(itemComponent.getString());
+                            }
+
+                            if (bSize != null) {
+                                corpse.setBSize(bSize);
+                            }
+
+                            if (hSize != null) {
+                                corpse.setHeight(hSize);
+                            }
+
+                            if (wSize != null) {
+                                corpse.setWidth(wSize);
                             }
                         }
                     }
@@ -218,7 +233,7 @@ public class PlacemcavillagercorpseProcedure {
                     }
                     if (entity instanceof LivingEntity _entity)
                         _entity.swing(InteractionHand.MAIN_HAND, true);
-                    if (!(entity instanceof Player _plr ? _plr.getAbilities().instabuild : false)) {
+                    if (!(entity instanceof Player _plr && _plr.getAbilities().instabuild)) {
                         if (entity instanceof Player _player) {
                             ItemStack _stktoremove = new ItemStack(MCAButcheryBlocks.MCAVILLAGERCORPSE.get());
                             _player.getInventory().clearOrCountMatchingItems(p -> _stktoremove.getItem() == p.getItem(), 1, _player.inventoryMenu.getCraftSlots());
@@ -358,11 +373,23 @@ public class PlacemcavillagercorpseProcedure {
                         if(corpseStack != null) {
                             UUID uuid = corpseStack.get(MCAButcheryItems.VILLAGER_UUID);
                             Component itemComponent = corpseStack.get(DataComponents.CUSTOM_NAME);
+                            Float bSize = corpseStack.get(MCAButcheryItems.B_SIZE);
+                            Float hSize = corpseStack.get(MCAButcheryItems.H_SIZE);
+                            Float wSize = corpseStack.get(MCAButcheryItems.W_SIZE);
                             if (uuid != null) {
                                 corpse.setVillager(uuid);
                             }
                             if(itemComponent != null) {
                                 corpse.setItemName(itemComponent.getString());
+                            }
+                            if(bSize != null) {
+                                corpse.setBSize(bSize);
+                            }
+                            if(hSize != null) {
+                                corpse.setHeight(hSize);
+                            }
+                            if(wSize != null) {
+                                corpse.setWidth(wSize);
                             }
                         }
                     }

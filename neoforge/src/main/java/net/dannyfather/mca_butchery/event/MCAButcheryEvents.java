@@ -5,6 +5,7 @@ import net.conczin.mca.client.resources.SkinExporter;
 import net.conczin.mca.client.resources.SkinLocations;
 import net.conczin.mca.entity.VillagerEntityMCA;
 import net.conczin.mca.entity.ZombieVillagerEntityMCA;
+import net.conczin.mca.entity.ai.Traits;
 import net.dannyfather.mca_butchery.MCAButchery;
 import net.dannyfather.mca_butchery.block.MCAButcheryBlocks;
 import net.dannyfather.mca_butchery.block.MCAVillagerCorpseBlock;
@@ -61,31 +62,37 @@ public class MCAButcheryEvents {
     public static void onEntityDeath(LivingDeathEvent event){
         LivingEntity entity = event.getEntity();
         DamageSource damageSource = event.getSource();
-        if (damageSource.getEntity() instanceof LivingEntity livingEntity) {
-            ItemStack weapon = livingEntity.getWeaponItem();
+        if (damageSource.getWeaponItem() != null) {
+            ItemStack weapon = damageSource.getWeaponItem();
             if (entity.level() instanceof ServerLevel serverLevel) {
                 if (weapon.is(ItemTags.create(ResourceLocation.parse("c:cleaver")))) {
-                    if (entity instanceof VillagerEntityMCA villagerEntityMCA && !villagerEntityMCA.isBaby()) {
-                        int entityId = villagerEntityMCA.getId();
-                        if(livingEntity instanceof ServerPlayer serverPlayer) {
-                            PacketDistributor.sendToPlayer(serverPlayer, new DownloadVillagerSkinPayload(entityId));
-                        } else {
+                    if(!entity.isBaby()) {
+                        if (entity instanceof VillagerEntityMCA villagerEntityMCA) {
+                            int entityId = villagerEntityMCA.getId();
                             ServerPlayer player = serverLevel.getRandomPlayer();
                             if (player != null) {
-                                PacketDistributor.sendToPlayer(player,new DownloadVillagerSkinPayload(entityId));
+                                PacketDistributor.sendToPlayer(player, new DownloadVillagerSkinPayload(entityId));
                             }
-                        }
 
-                        BlockPos pos = villagerEntityMCA.blockPosition();
-                        ItemStack item = MCAButcheryItems.MCAVILLAGERCORPSE.toStack();
-                        String villagerName = Component.translatable("block.mca_butchery.villager_corpse_named").getString().replace("{VILLAGERNAME}", villagerEntityMCA.getName().getString());
-                        item.set(DataComponents.CUSTOM_NAME, Component.literal(villagerName).withStyle(style -> style.withItalic(false)));
-                        item.set(MCAButcheryItems.VILLAGER_UUID, villagerEntityMCA.getUUID());
-                        Containers.dropItemStack(serverLevel, pos.getX(), pos.getY(), pos.getZ(), item);
-                    } else if (entity instanceof Villager villager) {
-                        BlockPos pos = villager.blockPosition();
-                        ItemStack item = ButcheryModItems.VILLAGER_CORPSE.toStack();
-                        Containers.dropItemStack(serverLevel, pos.getX(), pos.getY(), pos.getZ(), item);
+                            BlockPos pos = villagerEntityMCA.blockPosition();
+                            ItemStack item = MCAButcheryItems.MCAVILLAGERCORPSE.toStack();
+                            String villagerName = Component.translatable("block.mca_butchery.villager_corpse_named").getString().replace("{VILLAGERNAME}", villagerEntityMCA.getName().getString());
+                            item.set(DataComponents.CUSTOM_NAME, Component.literal(villagerName).withStyle(style -> style.withItalic(false)));
+                            item.set(MCAButcheryItems.VILLAGER_UUID, villagerEntityMCA.getUUID());
+                            item.set(MCAButcheryItems.B_SIZE, villagerEntityMCA.getGenetics().getBreastSize());
+                            Traits villagerTraits = villagerEntityMCA.getTraits();
+                            float hScale = (villagerTraits.hasTrait(Traits.DWARFISM) ? 0.65f : 1.0f) * villagerEntityMCA.getGenetics().getVerticalScaleFactor();
+                            float wScale = (villagerEntityMCA.getTraits().hasTrait(Traits.DWARFISM) ? 0.85f : 1.0f)
+                                    * (villagerTraits.hasTrait(Traits.TOUGH) ? 1.2F : 1.0F)
+                                    * (villagerTraits.hasTrait(Traits.WEAK) ? 0.85F : 1.0F) * villagerEntityMCA.getGenetics().getHorizontalScaleFactor();
+                            item.set(MCAButcheryItems.H_SIZE, hScale);
+                            item.set(MCAButcheryItems.W_SIZE, wScale);
+                            Containers.dropItemStack(serverLevel, pos.getX(), pos.getY(), pos.getZ(), item);
+                        } else if (entity instanceof Villager villager) {
+                            BlockPos pos = villager.blockPosition();
+                            ItemStack item = ButcheryModItems.VILLAGER_CORPSE.toStack();
+                            Containers.dropItemStack(serverLevel, pos.getX(), pos.getY(), pos.getZ(), item);
+                        }
                     }
                 }
             }
