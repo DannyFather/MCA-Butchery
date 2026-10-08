@@ -22,7 +22,7 @@ public class MCAButcheryCommonConfig {
         PLAYER_CORPSE = BUILDER.define("Drop Default Player Corpse",false);
 
 
-        GREY_EYES = BUILDER.comment("Desaturates eyes of MCA Villager corpses").define("Fresh Corpse Grey Eyes",true);
+        GREY_EYES = BUILDER.comment("Desaturates eyes of MCA Villager corpses").define("Fresh Corpse Grey Eyes",false);
         CLOSED_EYES = BUILDER.define("Closed Eyes", false);
 
 
