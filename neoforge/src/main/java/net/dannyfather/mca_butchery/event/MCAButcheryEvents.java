@@ -96,10 +96,10 @@ public class MCAButcheryEvents {
                                 item.set(MCAButcheryItems.W_SIZE, wScale);
                                 int face = (int) Math.floor( (double) villagerEntityMCA.getGenetics().getGene(Genetics.FACE) * 12);
                                 switch (face) {
-                                    case 0,1,2,3,4,6 -> {
+                                    case 0,1,2,3,4,5,6 -> {
                                         face = 2;
                                     }
-                                    case 5,7,8,10 -> {
+                                    case 7,8,10 -> {
                                         face = 1;
                                     }
                                     default -> {
