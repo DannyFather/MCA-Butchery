@@ -29,6 +29,7 @@ public class MCAVillagerCorpseBlockEntity extends RandomizableContainerBlockEnti
     private Float bSize = 0f;
     private Float wSize = 1f;
     private Float hSize = 1f;
+    private Integer face = 0;
 
     public MCAVillagerCorpseBlockEntity(BlockPos position, BlockState state) {
         super(MCAButcheryBlockEntities.MCAVILLAGERCORPSE.get(), position, state);
@@ -98,6 +99,19 @@ public class MCAVillagerCorpseBlockEntity extends RandomizableContainerBlockEnti
         return this.wSize;
     }
 
+    public void setFace(Integer face) {
+        this.face = face;
+        setChanged();
+
+        if (this.level != null && !this.level.isClientSide) {
+            this.level.sendBlockUpdated(this.worldPosition,this.getBlockState(),this.getBlockState(),3);
+        }
+    }
+
+    public Integer getFace() {
+        return this.face;
+    }
+
     @Override
     public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookupProvider) {
         super.loadAdditional(compound, lookupProvider);
@@ -108,21 +122,20 @@ public class MCAVillagerCorpseBlockEntity extends RandomizableContainerBlockEnti
         if (compound.contains("UUID")) {
             this.setVillager(compound.getUUID("UUID"));
         }
-
         if (compound.contains("CustomName")) {
             this.setItemName(compound.getString("CustomName"));
         }
-
         if (compound.contains("B_Size")) {
             this.setBSize(compound.getFloat("B_Size"));
         }
-
         if (compound.contains("H_Size")) {
             this.setHeight(compound.getFloat("H_Size"));
         }
-
         if (compound.contains("W_Size")) {
             this.setWidth(compound.getFloat("W_Size"));
+        }
+        if (compound.contains("Face")) {
+            this.setFace(compound.getInt("Face"));
         }
     }
 
@@ -136,21 +149,20 @@ public class MCAVillagerCorpseBlockEntity extends RandomizableContainerBlockEnti
         if (this.getVillager() != null) {
             compound.putUUID("UUID", this.getVillager());
         }
-
         if (this.getItemName() != null) {
             compound.putString("CustomName", this.getItemName());
         }
-
         if(this.getBSize() != null) {
             compound.putFloat("B_Size", this.getBSize());
         }
-
         if(this.getHeight() != null) {
             compound.putFloat("H_Size", this.getHeight());
         }
-
         if(this.getWidth() != null) {
             compound.putFloat("W_Size", this.getWidth());
+        }
+        if(this.getFace() != null) {
+            compound.putInt("Face", this.getFace());
         }
     }
 
@@ -163,21 +175,20 @@ public class MCAVillagerCorpseBlockEntity extends RandomizableContainerBlockEnti
         if(this.getVillager() != null) {
             stack.set(MCAButcheryItems.VILLAGER_UUID,this.getVillager());
         }
-
         if(this.getItemName() != null) {
             stack.set(DataComponents.CUSTOM_NAME,Component.literal(this.getItemName()).withStyle(style -> style.withItalic(false)));
         }
-
         if(this.getBSize() != null) {
             stack.set(MCAButcheryItems.B_SIZE, this.getBSize());
         }
-
         if(this.getHeight() != null) {
             stack.set(MCAButcheryItems.H_SIZE, this.getHeight());
         }
-
         if(this.getWidth() != null) {
             stack.set(MCAButcheryItems.W_SIZE, this.getWidth());
+        }
+        if(this.getFace() != null) {
+            stack.set(MCAButcheryItems.FACE, this.getFace());
         }
 
         return stack;

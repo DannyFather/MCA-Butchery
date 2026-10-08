@@ -4,12 +4,16 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.conczin.mca.client.resources.SkinExporter;
 import net.conczin.mca.entity.VillagerEntityMCA;
 import net.conczin.mca.entity.VillagerLike;
+import net.conczin.mca.entity.ai.Genetics;
 import net.dannyfather.mca_butchery.MCAButchery;
 import net.dannyfather.mca_butchery.client.ClientSkinCache;
 import net.dannyfather.mca_butchery.client.CorpseTexture;
+import net.dannyfather.mca_butchery.config.MCAButcheryCommonConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -80,13 +84,68 @@ public class MCAButcheryClientNetwork {
                 Entity entity = level.getEntity(payload.entityId());
                 if(entity instanceof VillagerEntityMCA villagerEntityMCA) {
                     String clothesVariant = villagerEntityMCA.isBurned() ? "burned" : "normal";
+                    if (MCAButcheryCommonConfig.CLOSED_EYES.get()) {
+                        villagerEntityMCA.getGenetics().setGene(Genetics.FACE,0.96f);
+                    }
                     try (NativeImage image = SkinExporter.createSkin(villagerEntityMCA,clothesVariant)){
                         byte[] data = image.asByteArray();
                         PacketDistributor.sendToServer(new UploadVillagerSkinPayload(data, villagerEntityMCA.getUUID()));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                }
+                } //else if (entity instanceof AbstractClientPlayer player) {
+//                    switch (payload.model()) {
+//                        case 0 -> {
+//                            VillagerLike<?> villagerLike = VillagerLike.toVillager(player);
+//
+//                            String clothesVariant = villagerLike.isBurned() ? "burned" : "normal";
+//                            if (MCAButcheryCommonConfig.CLOSED_EYES.get()) {
+//                                villagerLike.getGenetics().setGene(Genetics.FACE,0.96f);
+//                            }
+//                            try (NativeImage image = SkinExporter.createSkin(villagerLike,clothesVariant)){
+//                                byte[] data = image.asByteArray();
+//                                if(MCAButcheryCommonConfig.GREY_EYES.get()){
+//                                    int face = Math.round(villagerLike.getGenetics().getGene(Genetics.FACE) * 12);
+//                                    switch (face) {
+//                                        case 0,1,2,3,4,5,6,7 -> {
+//                                            face = 2;
+//                                        }
+//                                        case 8,9,11 -> {
+//                                            face = 1;
+//                                        }
+//                                        default -> {
+//                                            face = 0;
+//                                        }
+//
+//                                    }
+//                                    if (face != 0) {
+//                                        try {
+//                                            ResourceLocation faceLocation = ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "textures/entity/villager_eyes_" + face + ".png");
+//                                            NativeImage faceImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(faceLocation).open());
+//                                            NativeImage blended = blendEyes(image, faceImage);
+//                                            PacketDistributor.sendToServer(new UploadVillagerSkinPayload(blended.asByteArray(), player.getUUID()));
+//                                        } catch (Exception e) {
+//                                            throw new RuntimeException(e);
+//                                        }
+//                                    }
+//                                } else {
+//                                    PacketDistributor.sendToServer(new UploadVillagerSkinPayload(data, player.getUUID()));
+//                                }
+//                            } catch (IOException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                        }
+//                        case 1, 2 -> {
+//                            PlayerSkin playerSkin = player.getSkin();
+//                            ResourceLocation skinLocation = playerSkin.texture();
+//                            try (NativeImage skinImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(skinLocation).open())) {
+//                                PacketDistributor.sendToServer(new UploadVillagerSkinPayload(skinImage.asByteArray(), player.getUUID()));
+//                            } catch (Exception e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                        }
+//                    }
+//                }
             }
         });
     }
@@ -117,4 +176,35 @@ public class MCAButcheryClientNetwork {
         MCAButcheryNetwork.saveSkin(payload.data(), payload.villager().toString(), player);
     }
 
+    private static NativeImage blendEyes(NativeImage base,NativeImage overlay) {
+        int width = base.getWidth();
+        int height = base.getHeight();
+        NativeImage result = new NativeImage(width, height, true);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int baseColor = base.getPixelRGBA(x,y);
+                int overlayColor = overlay.getPixelRGBA(x,y);
+
+                int baseA = (baseColor >> 24) & 0xFF;
+                int baseB = (baseColor >> 16) & 0xFF;
+                int baseG = (baseColor >> 8) & 0xFF;
+                int baseR = baseColor & 0xFF;
+
+                int overlayA = (overlayColor >> 24) & 0xFF;
+                int overlayB = (overlayColor >> 16) & 0xFF;
+                int overlayG = (overlayColor >> 8) & 0xFF;
+                int overlayR = overlayColor & 0xFF;
+
+                float ratio = 0.7f;
+
+                if(overlayA == 0) {
+                    result.setPixelRGBA(x,y,baseA << 24| baseB << 16 | baseG << 8 | baseR );
+                } else {
+                    result.setPixelRGBA(x, y, baseA << 24 | (int) (baseB * (1 - ratio) + overlayB * ratio) << 16 | (int) (baseG * (1 - ratio) + overlayG * ratio) << 8 | (int) (baseR * (1 - ratio) + overlayR * ratio));
+                }
+
+            }
+        }
+        return result;
+    }
 }

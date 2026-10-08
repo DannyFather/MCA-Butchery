@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.conczin.mca.Config;
 import net.dannyfather.mca_butchery.MCAButchery;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerBoobsModel;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModel;
@@ -45,6 +46,7 @@ public class DrainedMCAVillagerCorpseItemRenderer extends BlockEntityWithoutLeve
         Float bSize = stack.get(MCAButcheryItems.B_SIZE);
         Float hSize = stack.get(MCAButcheryItems.H_SIZE);
         Float wSize = stack.get(MCAButcheryItems.W_SIZE);
+        Integer face = stack.get(MCAButcheryItems.FACE);
 
         poseStack.pushPose();
 
@@ -117,6 +119,14 @@ public class DrainedMCAVillagerCorpseItemRenderer extends BlockEntityWithoutLeve
                 return;
             }
 
+            if(face != null && face != 0) {
+                try (NativeImage eyesImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID,"textures/entity/villager_eyes_" + face + ".png")).open())) {
+                    cachedTexture = CorpseTexture.blendEyes(cachedTexture, eyesImage);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
             chosenSkin = cachedTexture;
 
         }
@@ -134,7 +144,8 @@ public class DrainedMCAVillagerCorpseItemRenderer extends BlockEntityWithoutLeve
 
         model.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
         if(bSize != null) {
-            this.bModel.setVisible(bSize > 0);
+            boolean boobsEnabled = Config.loadOrCreate().enableBoobs;
+            bModel.setVisible(bSize > 0 && boobsEnabled);
             poseStack.translate(0.5F, 0.8F, 0.5F);
             poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
             poseStack.translate(-0.5f, -0.98F, -0.5f);

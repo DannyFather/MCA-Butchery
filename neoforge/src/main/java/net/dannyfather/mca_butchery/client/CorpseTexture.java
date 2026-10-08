@@ -42,8 +42,7 @@ public class CorpseTexture {
                 int resultColor = baseColor;
 
                 if(drained) {
-                    int desaturatedBase = desaturate(baseColor, 0.6f);
-                    resultColor = desaturatedBase;
+                    resultColor = desaturate(baseColor, 0.6f);
                 }
                 if (blood) {
                     resultColor = blend(resultColor, overlayColor, maskAlpha, overlayMaskAmount);
@@ -60,6 +59,38 @@ public class CorpseTexture {
 
 
         Minecraft.getInstance().getTextureManager().register(location, dynamicTexture);
+    }
+
+    public static NativeImage blendEyes(NativeImage base,NativeImage overlay) {
+        int width = base.getWidth();
+        int height = base.getHeight();
+        NativeImage result = new NativeImage(width, height, true);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int baseColor = base.getPixelRGBA(x,y);
+                int overlayColor = overlay.getPixelRGBA(x,y);
+
+                int baseA = (baseColor >> 24) & 0xFF;
+                int baseB = (baseColor >> 16) & 0xFF;
+                int baseG = (baseColor >> 8) & 0xFF;
+                int baseR = baseColor & 0xFF;
+
+                int overlayA = (overlayColor >> 24) & 0xFF;
+                int overlayB = (overlayColor >> 16) & 0xFF;
+                int overlayG = (overlayColor >> 8) & 0xFF;
+                int overlayR = overlayColor & 0xFF;
+
+                float ratio = 0.7f;
+
+                if(overlayA == 0) {
+                    result.setPixelRGBA(x,y,baseA << 24| baseB << 16 | baseG << 8 | baseR );
+                } else {
+                    result.setPixelRGBA(x, y, baseA << 24 | (int) (baseB * (1 - ratio) + overlayB * ratio) << 16 | (int) (baseG * (1 - ratio) + overlayG * ratio) << 8 | (int) (baseR * (1 - ratio) + overlayR * ratio));
+                }
+
+            }
+        }
+        return result;
     }
 
     private static int blend(int base, int overlay, int amount, float overlayAmount) {

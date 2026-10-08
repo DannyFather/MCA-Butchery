@@ -193,6 +193,7 @@ public class PlacemcavillagercorpseProcedure {
                             Float bSize = corpseStack.get(MCAButcheryItems.B_SIZE);
                             Float hSize = corpseStack.get(MCAButcheryItems.H_SIZE);
                             Float wSize = corpseStack.get(MCAButcheryItems.W_SIZE);
+                            Integer face = corpseStack.get(MCAButcheryItems.FACE);
 
                             if (uuid != null) {
                                 corpse.setVillager(uuid);
@@ -212,6 +213,10 @@ public class PlacemcavillagercorpseProcedure {
 
                             if (wSize != null) {
                                 corpse.setWidth(wSize);
+                            }
+
+                            if (face != null) {
+                                corpse.setFace(face);
                             }
                         }
                     }
@@ -235,8 +240,15 @@ public class PlacemcavillagercorpseProcedure {
                         _entity.swing(InteractionHand.MAIN_HAND, true);
                     if (!(entity instanceof Player _plr && _plr.getAbilities().instabuild)) {
                         if (entity instanceof Player _player) {
-                            ItemStack _stktoremove = new ItemStack(MCAButcheryBlocks.MCAVILLAGERCORPSE.get());
-                            _player.getInventory().clearOrCountMatchingItems(p -> _stktoremove.getItem() == p.getItem(), 1, _player.inventoryMenu.getCraftSlots());
+                            if(_player.getMainHandItem().getItem().equals(MCAButcheryBlocks.MCAVILLAGERCORPSE.get().asItem())) {
+                                ItemStack item = _player.getMainHandItem();
+                                item.shrink(1);
+                                _player.setItemInHand(InteractionHand.MAIN_HAND, item);
+                            } else if(_player.getOffhandItem().getItem().equals(MCAButcheryBlocks.MCAVILLAGERCORPSE.get().asItem())) {
+                                ItemStack item = _player.getOffhandItem();
+                                item.shrink(1);
+                                _player.setItemInHand(InteractionHand.OFF_HAND, item);
+                            }
                         }
                     }
                 }
@@ -376,6 +388,7 @@ public class PlacemcavillagercorpseProcedure {
                             Float bSize = corpseStack.get(MCAButcheryItems.B_SIZE);
                             Float hSize = corpseStack.get(MCAButcheryItems.H_SIZE);
                             Float wSize = corpseStack.get(MCAButcheryItems.W_SIZE);
+                            Integer face = corpseStack.get(MCAButcheryItems.FACE);
                             if (uuid != null) {
                                 corpse.setVillager(uuid);
                             }
@@ -390,6 +403,9 @@ public class PlacemcavillagercorpseProcedure {
                             }
                             if(wSize != null) {
                                 corpse.setWidth(wSize);
+                            }
+                            if(face != null) {
+                                corpse.setFace(face);
                             }
                         }
                     }
@@ -423,8 +439,15 @@ public class PlacemcavillagercorpseProcedure {
                     }
                     if (!(entity instanceof Player _plr ? _plr.getAbilities().instabuild : false)) {
                         if (entity instanceof Player _player) {
-                            ItemStack _stktoremove = new ItemStack(MCAButcheryBlocks.DRAINEDMCAVILLAGERCORPSE.get());
-                            _player.getInventory().clearOrCountMatchingItems(p -> _stktoremove.getItem() == p.getItem(), 1, _player.inventoryMenu.getCraftSlots());
+                            if(_player.getMainHandItem().getItem().equals(MCAButcheryBlocks.MCAVILLAGERCORPSE.get().asItem())) {
+                                ItemStack item = _player.getMainHandItem();
+                                item.shrink(1);
+                                _player.setItemInHand(InteractionHand.MAIN_HAND, item);
+                            } else if(_player.getOffhandItem().getItem().equals(MCAButcheryBlocks.MCAVILLAGERCORPSE.get().asItem())) {
+                                ItemStack item = _player.getOffhandItem();
+                                item.shrink(1);
+                                _player.setItemInHand(InteractionHand.OFF_HAND, item);
+                            }
                         }
                     }
                 }

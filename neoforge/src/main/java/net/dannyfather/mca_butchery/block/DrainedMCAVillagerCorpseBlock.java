@@ -249,10 +249,11 @@ public class DrainedMCAVillagerCorpseBlock extends Block implements EntityBlock 
                 Float bSize = corpse.getBSize();
                 Float hSize = corpse.getHeight();
                 Float wSize = corpse.getWidth();
+                Integer face = corpse.getFace();
                 if(itemName == null) {
                     itemName = Component.translatable("block.mca_butchery.drained_villager_corpse").getString();
                 }
-                DrainedMCAVillagercorpsebrokenProcedure.execute(world, pos.getX(), pos.getY(), pos.getZ(), blockstate, entity, villager, itemName, bSize, hSize, wSize);
+                DrainedMCAVillagercorpsebrokenProcedure.execute(world, pos.getX(), pos.getY(), pos.getZ(), blockstate, entity, villager, itemName, bSize, hSize, wSize, face);
             }
         }
         boolean retval = super.onDestroyedByPlayer(blockstate, world, pos, entity, willHarvest, fluid);
@@ -321,6 +322,7 @@ public class DrainedMCAVillagerCorpseBlock extends Block implements EntityBlock 
                 Float bSize = stack.get(MCAButcheryItems.B_SIZE);
                 Float hSize = stack.get(MCAButcheryItems.H_SIZE);
                 Float wSize = stack.get(MCAButcheryItems.W_SIZE);
+                Integer face = stack.get(MCAButcheryItems.FACE);
 
                 if (uuid != null) {
                     corpse.setVillager(uuid);
@@ -336,6 +338,9 @@ public class DrainedMCAVillagerCorpseBlock extends Block implements EntityBlock 
                 }
                 if(wSize != null) {
                     corpse.setWidth(wSize);
+                }
+                if(face != null) {
+                    corpse.setFace(face);
                 }
             }
         }

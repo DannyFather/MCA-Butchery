@@ -30,6 +30,7 @@ public class DrainedMCAVillagerCorpseBlockEntity extends RandomizableContainerBl
     private Float bSize = 0f;
     private Float hSize = 1f;
     private Float wSize = 1f;
+    private Integer face = 0;
 
     public DrainedMCAVillagerCorpseBlockEntity(BlockPos position, BlockState state) {
         super(MCAButcheryBlockEntities.DRAINEDMCAVILLAGERCORPSE.get(), position, state);
@@ -99,6 +100,19 @@ public class DrainedMCAVillagerCorpseBlockEntity extends RandomizableContainerBl
         return this.wSize;
     }
 
+    public void setFace(int face) {
+        this.face = face;
+        setChanged();
+
+        if (this.level != null && !this.level.isClientSide) {
+            this.level.sendBlockUpdated(this.worldPosition,this.getBlockState(),this.getBlockState(),3);
+        }
+    }
+
+    public Integer getFace() {
+        return this.face;
+    }
+
     @Override
     public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookupProvider) {
         super.loadAdditional(compound, lookupProvider);
@@ -124,6 +138,10 @@ public class DrainedMCAVillagerCorpseBlockEntity extends RandomizableContainerBl
 
         if(compound.contains("W_Size")) {
             this.setWidth(compound.getFloat("W_Size"));
+        }
+
+        if(compound.contains("Face")) {
+            this.setFace(compound.getInt("Face"));
         }
     }
 
@@ -152,6 +170,10 @@ public class DrainedMCAVillagerCorpseBlockEntity extends RandomizableContainerBl
 
         if(this.getWidth() != null) {
             compound.putFloat("W_Size", this.getWidth());
+        }
+
+        if(this.getFace() != null) {
+            compound.putFloat("Face", this.getFace());
         }
     }
 
@@ -244,6 +266,10 @@ public class DrainedMCAVillagerCorpseBlockEntity extends RandomizableContainerBl
 
         if(this.getWidth() != null) {
             stack.set(MCAButcheryItems.W_SIZE, this.getWidth());
+        }
+
+        if(this.getFace() != null) {
+            stack.set(MCAButcheryItems.FACE, this.getFace());
         }
 
         return stack;

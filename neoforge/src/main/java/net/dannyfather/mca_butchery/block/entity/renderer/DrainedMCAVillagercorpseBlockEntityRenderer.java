@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.conczin.mca.Config;
 import net.dannyfather.mca_butchery.MCAButchery;
 import net.dannyfather.mca_butchery.block.DrainedMCAVillagerCorpseBlock;
 import net.dannyfather.mca_butchery.block.entity.DrainedMCAVillagerCorpseBlockEntity;
@@ -57,6 +58,7 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
         Float bSize = blockEntity.getBSize();
         Float hSize = blockEntity.getHeight();
         Float wSize = blockEntity.getWidth();
+        Integer face = blockEntity.getFace();
 
         poseStack.pushPose();
 
@@ -102,25 +104,33 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
                 return;
             }
 
+            if(face != 0) {
+                try (NativeImage eyesImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID,"textures/entity/villager_eyes_" + face + ".png")).open())) {
+                    cachedTexture = CorpseTexture.blendEyes(cachedTexture, eyesImage);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
             chosenSkin = cachedTexture;
 
         }
 
 
 
-        CorpseTexture drainedTexture = new CorpseTexture("corpse_drained_" + villager,chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,false,true);
-        CorpseTexture bloodyTexture = new CorpseTexture("corpse_bloody_" + villager,chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,true,true);
-        CorpseTexture cutOpenTexture = new CorpseTexture("corpse_cut_open_"+ villager ,chosenSkin,cutOpenBlood,cutOpenMask,cutOpenBloodMask,true,true);
 
         organsandBonesHangingModel.setVisibleParts(state);
         model.setVisibleParts(state);
         hangingModel.setVisibleParts(state);
-        villagerBoobsModel.setVisible(bSize > 0);
 
-        VertexConsumer drainedConsumer = bufferSource.getBuffer(RenderType.entityCutout(drainedTexture.getLocation()));
+
+        boolean boobsEnabled = Config.loadOrCreate().enableBoobs;
+        villagerBoobsModel.setVisible(bSize > 0 && boobsEnabled);
 
         switch (state) {
             case 0 -> {
+                CorpseTexture drainedTexture = new CorpseTexture("corpse_drained_" + villager,chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,false,true);
+                VertexConsumer drainedConsumer = bufferSource.getBuffer(RenderType.entityCutout(drainedTexture.getLocation()));
                 poseStack.translate(0.5F, 0F, 0.25F * wSize);
                 poseStack.scale(wSize,hSize,wSize);
                 poseStack.translate(-0.5F, 0F, -0.25F * wSize);
@@ -135,6 +145,8 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
             }
 
             case 1-> {
+                CorpseTexture drainedTexture = new CorpseTexture("corpse_drained_" + villager,chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,false,true);
+                VertexConsumer drainedConsumer = bufferSource.getBuffer(RenderType.entityCutout(drainedTexture.getLocation()));
                 poseStack.translate(0.5F, 0.7F, 0.5F);
                 poseStack.scale(wSize,hSize,wSize);
                 poseStack.translate(-0.5F, -0.7F, -0.5F);
@@ -148,22 +160,27 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
             }
 
             case 2,3,4,5,6 -> {
+                CorpseTexture bloodyTexture = new CorpseTexture("corpse_bloody_" + villager,chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,true,true);
                 cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, bloodyTexture.getLocation(),true, bSize, hSize, wSize);
             }
 
             case 7,8,9,10,20 -> {
+                CorpseTexture cutOpenTexture = new CorpseTexture("corpse_cut_open_"+ villager ,chosenSkin,cutOpenBlood,cutOpenMask,cutOpenBloodMask,true,true);
                 cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, cutOpenTexture.getLocation(),true, bSize, hSize, wSize);
             }
 
             case 11,12,13 -> {
+                CorpseTexture bloodyTexture = new CorpseTexture("corpse_bloody_" + villager,chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,true,true);
                 cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, bloodyTexture.getLocation(),false, bSize, hSize, wSize);
             }
 
             case 14,15,16,17,19 -> {
+                CorpseTexture cutOpenTexture = new CorpseTexture("corpse_cut_open_"+ villager ,chosenSkin,cutOpenBlood,cutOpenMask,cutOpenBloodMask,true,true);
                 cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, cutOpenTexture.getLocation(),false, bSize, hSize, wSize);
             }
 
             case 18 -> {
+                CorpseTexture cutOpenTexture = new CorpseTexture("corpse_cut_open_"+ villager ,chosenSkin,cutOpenBlood,cutOpenMask,cutOpenBloodMask,true,true);
                 villagerBoobsModel.setVisible(false);
                 cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, cutOpenTexture.getLocation(),false, bSize, hSize, wSize);
             }

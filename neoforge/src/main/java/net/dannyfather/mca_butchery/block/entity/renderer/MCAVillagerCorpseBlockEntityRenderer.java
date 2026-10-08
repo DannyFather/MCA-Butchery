@@ -1,5 +1,6 @@
 package net.dannyfather.mca_butchery.block.entity.renderer;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -10,15 +11,20 @@ import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerBoobsModel;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseHangingModel;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModel;
 import net.dannyfather.mca_butchery.client.ClientSkinCache;
+import net.dannyfather.mca_butchery.client.CorpseTexture;
+import net.dannyfather.mca_butchery.config.MCAButcheryCommonConfig;
 import net.dannyfather.mca_butchery.network.MCAButcheryClientNetwork;
 import net.dannyfather.mca_butchery.network.MCAButcheryNetwork;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 
+import java.io.IOException;
 import java.util.UUID;
 
 public class MCAVillagerCorpseBlockEntityRenderer implements BlockEntityRenderer<MCAVillagerCorpseBlockEntity> {
@@ -43,6 +49,7 @@ public class MCAVillagerCorpseBlockEntityRenderer implements BlockEntityRenderer
         Float bSize = blockEntity.getBSize();
         Float hSize = blockEntity.getHeight();
         Float wSize = blockEntity.getWidth();
+        Integer face = blockEntity.getFace();
 
 
         poseStack.pushPose();
@@ -66,7 +73,23 @@ public class MCAVillagerCorpseBlockEntityRenderer implements BlockEntityRenderer
                 poseStack.popPose();
                 return;
             }
-            vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(texture));
+            NativeImage textureImage = ClientSkinCache.getImage(villager);
+            if(face != 0 && MCAButcheryCommonConfig.GREY_EYES.get()) {
+                try {
+                    NativeImage eyesImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "textures/entity/villager_eyes_" + face + ".png")).open());
+                    ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "dynamic/corpse_" + villager);
+
+                    DynamicTexture dynamicTexture = new DynamicTexture(CorpseTexture.blendEyes(textureImage,eyesImage));
+
+
+                    Minecraft.getInstance().getTextureManager().register(resourceLocation, dynamicTexture);
+                    vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(resourceLocation));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(texture));
+            }
         } else {
             vertexConsumer  = bufferSource.getBuffer(RenderType.entityCutout(DEFAULT_TEXTURE));
         }
