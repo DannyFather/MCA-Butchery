@@ -17,6 +17,7 @@ import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelResource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -93,59 +94,17 @@ public class MCAButcheryClientNetwork {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                } //else if (entity instanceof AbstractClientPlayer player) {
-//                    switch (payload.model()) {
-//                        case 0 -> {
-//                            VillagerLike<?> villagerLike = VillagerLike.toVillager(player);
-//
-//                            String clothesVariant = villagerLike.isBurned() ? "burned" : "normal";
-//                            if (MCAButcheryCommonConfig.CLOSED_EYES.get()) {
-//                                villagerLike.getGenetics().setGene(Genetics.FACE,0.96f);
-//                            }
-//                            try (NativeImage image = SkinExporter.createSkin(villagerLike,clothesVariant)){
-//                                byte[] data = image.asByteArray();
-//                                if(MCAButcheryCommonConfig.GREY_EYES.get()){
-//                                    int face = Math.round(villagerLike.getGenetics().getGene(Genetics.FACE) * 12);
-//                                    switch (face) {
-//                                        case 0,1,2,3,4,5,6,7 -> {
-//                                            face = 2;
-//                                        }
-//                                        case 8,9,11 -> {
-//                                            face = 1;
-//                                        }
-//                                        default -> {
-//                                            face = 0;
-//                                        }
-//
-//                                    }
-//                                    if (face != 0) {
-//                                        try {
-//                                            ResourceLocation faceLocation = ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "textures/entity/villager_eyes_" + face + ".png");
-//                                            NativeImage faceImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(faceLocation).open());
-//                                            NativeImage blended = blendEyes(image, faceImage);
-//                                            PacketDistributor.sendToServer(new UploadVillagerSkinPayload(blended.asByteArray(), player.getUUID()));
-//                                        } catch (Exception e) {
-//                                            throw new RuntimeException(e);
-//                                        }
-//                                    }
-//                                } else {
-//                                    PacketDistributor.sendToServer(new UploadVillagerSkinPayload(data, player.getUUID()));
-//                                }
-//                            } catch (IOException e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                        }
-//                        case 1, 2 -> {
-//                            PlayerSkin playerSkin = player.getSkin();
-//                            ResourceLocation skinLocation = playerSkin.texture();
-//                            try (NativeImage skinImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(skinLocation).open())) {
-//                                PacketDistributor.sendToServer(new UploadVillagerSkinPayload(skinImage.asByteArray(), player.getUUID()));
-//                            } catch (Exception e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                        }
-//                    }
-//                }
+                } else if (entity instanceof AbstractClientPlayer player) {
+                    if (payload.model() == 1 || payload.model() == 2) {
+                        PlayerSkin playerSkin = player.getSkin();
+                        ResourceLocation skinLocation = playerSkin.texture();
+                        try (NativeImage skinImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(skinLocation).open())) {
+                            PacketDistributor.sendToServer(new UploadVillagerSkinPayload(skinImage.asByteArray(), player.getUUID()));
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
             }
         });
     }
