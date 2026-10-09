@@ -16,6 +16,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ArmorStandRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Rotations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -40,7 +42,11 @@ public class MCAVillagerHeadArmorStandRenderer extends RenderLayer<ArmorStand, A
         if(stack.is(MCAButcheryItems.MCAVILLAGERHEAD.get())) {
 
             UUID villager = stack.get(MCAButcheryItems.VILLAGER_UUID);
+            Float hSize = stack.get(MCAButcheryItems.H_SIZE);
+            Float wSize = stack.get(MCAButcheryItems.W_SIZE);
+
             poseStack.pushPose();
+
 
 
             VertexConsumer vertexConsumer;
@@ -59,11 +65,15 @@ public class MCAVillagerHeadArmorStandRenderer extends RenderLayer<ArmorStand, A
             } else {
                 vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(DEFAULT_TEXTURE));
             }
-            poseStack.mulPose(Axis.YP.rotationDegrees(netHeadYaw));
             poseStack.mulPose(Axis.XP.rotationDegrees(headPitch));
+
 
             poseStack.scale(1.192F, 1.192F, 1.192F);
             poseStack.mulPose(Axis.XP.rotationDegrees(180f));
+            poseStack.mulPose(Axis.YP.rotationDegrees(-livingEntity.getHeadPose().getY()));
+            if(hSize != null && wSize != null) {
+                poseStack.scale(0.8f*wSize, 0.8f*hSize, 0.8f*wSize);
+            }
             poseStack.translate(-0.5f, -0.0625f, -0.5f);
 
             model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);

@@ -101,6 +101,10 @@ public class MCAVillagercutupProcedure {
                             if(serverLevel.getBlockEntity(pos) instanceof DrainedMCAVillagerCorpseBlockEntity corpse) {
                                 UUID villager = corpse.getVillager();
                                 String itemName = corpse.getItemName();
+                                Float bSize = corpse.getBSize();
+                                Float hSize = corpse.getHeight();
+                                Float wSize = corpse.getWidth();
+                                Integer face = corpse.getFace();
 
 
                                 ItemStack item = MCAButcheryItems.MCAVILLAGERHEAD.toStack();
@@ -111,7 +115,21 @@ public class MCAVillagercutupProcedure {
                                     String name = Component.translatable("block.mca_butchery.villager_head_named").getString().replace("{VILLAGERNAME}", villagerName);
                                     item.set(DataComponents.CUSTOM_NAME, Component.literal(name).withStyle(style -> style.withItalic(false)));
                                 }
-                                item.set(MCAButcheryItems.VILLAGER_UUID, villager);
+                                if(villager != null) {
+                                    item.set(MCAButcheryItems.VILLAGER_UUID, villager);
+                                }
+                                if(bSize != null) {
+                                    item.set(MCAButcheryItems.B_SIZE, bSize);
+                                }
+                                if(hSize != null) {
+                                    item.set(MCAButcheryItems.H_SIZE, hSize);
+                                }
+                                if(wSize != null) {
+                                    item.set(MCAButcheryItems.W_SIZE, wSize);
+                                }
+                                if(face != null) {
+                                    item.set(MCAButcheryItems.FACE, face);
+                                }
                                 Containers.dropItemStack(serverLevel, pos.getX(), pos.getY(), pos.getZ(), item);
                             }
                         }

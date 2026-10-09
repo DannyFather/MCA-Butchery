@@ -3,14 +3,12 @@ package net.dannyfather.mca_butchery;
 import com.mojang.logging.LogUtils;
 import net.dannyfather.mca_butchery.block.MCAButcheryBlocks;
 import net.dannyfather.mca_butchery.block.entity.MCAButcheryBlockEntities;
-import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseHangingModel;
-import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModel;
-import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerHeadModel;
-import net.dannyfather.mca_butchery.block.entity.models.OrgansandBonesHangingModel;
+import net.dannyfather.mca_butchery.block.entity.models.*;
 import net.dannyfather.mca_butchery.block.entity.renderer.DrainedMCAVillagercorpseBlockEntityRenderer;
 import net.dannyfather.mca_butchery.block.entity.renderer.MCAVillagerHeadBlockEntityRenderer;
 import net.dannyfather.mca_butchery.block.entity.renderer.MCAVillagerCorpseBlockEntityRenderer;
 import net.dannyfather.mca_butchery.client.*;
+import net.dannyfather.mca_butchery.config.MCAButcheryCommonConfig;
 import net.dannyfather.mca_butchery.item.MCAButcheryItems;
 import net.mcreator.butchery.configuration.ButcheryconfigConfiguration;
 import net.minecraft.client.model.HumanoidModel;
@@ -29,6 +27,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
@@ -51,6 +50,11 @@ public class MCAButchery {
         MCAButcheryItems.REGISTRY.register(modEventBus);
         MCAButcheryBlocks.REGISTRY.register(modEventBus);
         MCAButcheryBlockEntities.REGISTRY.register(modEventBus);
+
+        modContainer.registerConfig(
+                ModConfig.Type.COMMON,
+                MCAButcheryCommonConfig.SPEC
+        );
 
         MCAButcheryItems.DATA_COMPONENTS.register(modEventBus);
     }
@@ -89,6 +93,11 @@ public class MCAButchery {
             event.registerLayerDefinition(
                     MCAVillagerHeadModel.LAYER_LOCATION,
                     MCAVillagerHeadModel::createBodyLayer
+            );
+
+            event.registerLayerDefinition(
+                    MCAVillagerBoobsModel.LAYER_LOCATION,
+                    MCAVillagerBoobsModel::createBodyLayer
             );
         }
 

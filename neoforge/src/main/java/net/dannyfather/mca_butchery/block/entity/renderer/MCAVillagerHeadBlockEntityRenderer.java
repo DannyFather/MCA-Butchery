@@ -35,6 +35,8 @@ public class MCAVillagerHeadBlockEntityRenderer implements BlockEntityRenderer<M
         int state = blockEntity.getBlockState().getValue(MCAVillagerHeadBlock.BLOCKSTATE);
         int rotation = blockEntity.getBlockState().getValue(MCAVillagerHeadBlock.ROTATION);
         UUID villager = blockEntity.getVillager();
+        Float hSize = blockEntity.getHeight();
+        Float wSize = blockEntity.getWidth();
 
 
         poseStack.pushPose();
@@ -44,6 +46,7 @@ public class MCAVillagerHeadBlockEntityRenderer implements BlockEntityRenderer<M
             case 0 -> {
                 poseStack.translate(0.5F, 0.0F, 0.5F);
                 poseStack.mulPose( Axis.YP.rotationDegrees(180f - rotation * 22.5f ) );
+                poseStack.scale(wSize,hSize,wSize);
                 poseStack.translate(-0.5F, 0.0F, -0.5F);
             }
 
@@ -51,8 +54,9 @@ public class MCAVillagerHeadBlockEntityRenderer implements BlockEntityRenderer<M
 
                 poseStack.translate(0.5F, 0.0F, 0.5F);
                 poseStack.mulPose( Axis.YP.rotationDegrees(-facing.toYRot()) );
-                poseStack.translate(-0.5F, 0.0F, -0.5F);
-                poseStack.translate(0f,0.25f,-0.25f);
+                poseStack.translate(0F, 0.5F, -0.5F);
+                poseStack.scale(wSize,hSize,wSize);
+                poseStack.translate(-0.5f,-0.25f,-0.25f);
             }
 
         }

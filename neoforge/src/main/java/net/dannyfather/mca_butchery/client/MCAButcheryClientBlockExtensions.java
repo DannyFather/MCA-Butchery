@@ -25,9 +25,9 @@ public class MCAButcheryClientBlockExtensions implements IClientBlockExtensions 
             double y = pos.getY() + random.nextDouble();
             double z = pos.getZ() + random.nextDouble();
 
-            double vx = (random.nextDouble() - 0.5) * 0.2;
-            double vy = (random.nextDouble() - 0.5) * 0.2;
-            double vz = (random.nextDouble() - 0.5) * 0.2;
+            double vx = (random.nextDouble()) * 0.2;
+            double vy = (random.nextDouble()) * 0.2;
+            double vz = (random.nextDouble()) * 0.2;
 
             level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK,particleState), x, y, z, vx, vy, vz);
         }
@@ -42,17 +42,17 @@ public class MCAButcheryClientBlockExtensions implements IClientBlockExtensions 
         BlockState particleState = Blocks.NETHER_WART_BLOCK.defaultBlockState();
 
         RandomSource random = level.getRandom();
-        BlockPos pos = new BlockPos((int) target.getLocation().x,(int) target.getLocation().y,(int) target.getLocation().z - 1);
+        BlockPos pos = new BlockPos((int) target.getLocation().x,(int) target.getLocation().y,(int) target.getLocation().z);
 
         for (int i = 0; i < 2; i++) {
             double scale = 0.0002;
-            double x = pos.getX() + 0.5 + random.nextDouble() * scale;
-            double y = pos.getY() + 0.1 + random.nextDouble() * scale;
-            double z = pos.getZ() + 0.5 + random.nextDouble() * scale;
+            double x = pos.getX() - 0.5 + random.nextDouble() * scale;
+            double y = pos.getY() + 0.7 + random.nextDouble() * scale;
+            double z = pos.getZ() - 0.5 + random.nextDouble() * scale;
 
-            double vx = (random.nextDouble() - 0.5) * scale;
-            double vy = (random.nextDouble() - 0.5) * scale;
-            double vz = (random.nextDouble() - 0.5) * scale;
+            double vx = (random.nextDouble()) * scale;
+            double vy = (random.nextDouble()) * scale;
+            double vz = (random.nextDouble()) * scale;
 
             level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK,particleState), x, y, z, vx, vy, vz);
         }

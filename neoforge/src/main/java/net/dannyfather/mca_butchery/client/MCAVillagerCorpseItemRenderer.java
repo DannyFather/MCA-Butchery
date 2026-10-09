@@ -1,10 +1,14 @@
 package net.dannyfather.mca_butchery.client;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.conczin.mca.Config;
 import net.dannyfather.mca_butchery.MCAButchery;
+import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerBoobsModel;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModel;
+import net.dannyfather.mca_butchery.config.MCAButcheryCommonConfig;
 import net.dannyfather.mca_butchery.item.MCAButcheryItems;
 import net.dannyfather.mca_butchery.network.MCAButcheryNetwork;
 import net.minecraft.client.Minecraft;
@@ -13,15 +17,19 @@ import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
+import java.io.IOException;
 import java.util.UUID;
 
 public class MCAVillagerCorpseItemRenderer extends BlockEntityWithoutLevelRenderer {
 
     private MCAVillagerCorpseModel<?> model;
+    private MCAVillagerBoobsModel<?> bModel;
 
     private static final ResourceLocation DEFAULT_TEXTURE = ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "textures/entity/villager_corpse.png");
 
@@ -33,9 +41,14 @@ public class MCAVillagerCorpseItemRenderer extends BlockEntityWithoutLevelRender
     public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         if (this.model == null) {
             this.model = new MCAVillagerCorpseModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(MCAVillagerCorpseModel.LAYER_LOCATION));
+            this.bModel = new MCAVillagerBoobsModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(MCAVillagerBoobsModel.LAYER_LOCATION));
         }
 
         UUID villager = stack.get(MCAButcheryItems.VILLAGER_UUID);
+        Float bSize = stack.get(MCAButcheryItems.B_SIZE);
+        Float hSize = stack.get(MCAButcheryItems.H_SIZE);
+        Float wSize = stack.get(MCAButcheryItems.W_SIZE);
+        Integer face = stack.get(MCAButcheryItems.FACE);
 
         poseStack.pushPose();
 
@@ -98,14 +111,46 @@ public class MCAVillagerCorpseItemRenderer extends BlockEntityWithoutLevelRender
                 poseStack.popPose();
                 return;
             }
-            vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(texture));
+            NativeImage textureImage = ClientSkinCache.getImage(villager);
+            if(face != null && face != 0 && MCAButcheryCommonConfig.GREY_EYES.get()) {
+                try {
+                    NativeImage eyesImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "textures/entity/villager_eyes_" + face + ".png")).open());
+                    ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "dynamic/corpse_" + villager);
+
+                    DynamicTexture dynamicTexture = new DynamicTexture(CorpseTexture.blendEyes(textureImage,eyesImage));
+
+
+                    Minecraft.getInstance().getTextureManager().register(resourceLocation, dynamicTexture);
+                    vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(resourceLocation));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(texture));
+            }
         } else {
             vertexConsumer  = bufferSource.getBuffer(RenderType.entityCutout(DEFAULT_TEXTURE));
         }
 
-        this.model.renderToBuffer(poseStack,vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+        if(hSize != null && wSize != null) {
+            poseStack.translate(0.5F, 0F, 0.25F * wSize);
+            poseStack.scale(wSize,hSize,wSize);
+            poseStack.translate(-0.5F, 0F, -0.25F * wSize);
+        }
+
+        model.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+        if(bSize != null) {
+            boolean boobsEnabled = Config.loadOrCreate().enableBoobs;
+            bModel.setVisible(bSize > 0 && boobsEnabled);
+            poseStack.translate(0.5F, 0.8F, 0.5F);
+            poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
+            poseStack.translate(-0.5f, -0.98F, -0.5f);
+            poseStack.translate(0f,0f, - 0.38f + (0.24f * bSize));
+            bModel.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
+        }
 
         poseStack.popPose();
+
 
     }
 }

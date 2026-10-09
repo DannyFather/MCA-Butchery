@@ -115,10 +115,14 @@ public class MCAVillagerCorpseBlock extends Block implements EntityBlock {
             if (blockEntity instanceof MCAVillagerCorpseBlockEntity corpse) {
                 UUID villager = corpse.getVillager();
                 String itemName = corpse.getItemName();
+                Float bSize = corpse.getBSize();
+                Float hSize = corpse.getHeight();
+                Float wSize = corpse.getWidth();
+                Integer face = corpse.getFace();
                 if (itemName == null) {
                     itemName = Component.translatable("block.mca_butchery.villager_corpse").getString();
                 }
-                MCAVillagercorpsebrokenProcedure.execute(world, pos.getX(), pos.getY(), pos.getZ(), blockstate, entity, villager, itemName);
+                MCAVillagercorpsebrokenProcedure.execute(world, pos.getX(), pos.getY(), pos.getZ(), blockstate, entity, villager, itemName, bSize, hSize, wSize, face);
             }
         }
         boolean retval = super.onDestroyedByPlayer(blockstate, world, pos, entity, willHarvest, fluid);
@@ -199,12 +203,28 @@ public class MCAVillagerCorpseBlock extends Block implements EntityBlock {
             if (blockEntity instanceof MCAVillagerCorpseBlockEntity corpse) {
                 UUID uuid = stack.get(MCAButcheryItems.VILLAGER_UUID);
                 Component itemComponent = stack.get(DataComponents.CUSTOM_NAME);
+                Float bSize = stack.get(MCAButcheryItems.B_SIZE);
+                Float hSize = stack.get(MCAButcheryItems.H_SIZE);
+                Float wSize = stack.get(MCAButcheryItems.W_SIZE);
+                Integer face = stack.get(MCAButcheryItems.FACE);
 
                 if (uuid != null) {
                     corpse.setVillager(uuid);
                 }
                 if (itemComponent != null) {
                     corpse.setItemName(itemComponent.getString());
+                }
+                if (bSize != null) {
+                    corpse.setBSize(bSize);
+                }
+                if (hSize != null) {
+                    corpse.setHeight(hSize);
+                }
+                if (wSize != null) {
+                    corpse.setWidth(wSize);
+                }
+                if (face != null) {
+                    corpse.setFace(face);
                 }
             }
         }
