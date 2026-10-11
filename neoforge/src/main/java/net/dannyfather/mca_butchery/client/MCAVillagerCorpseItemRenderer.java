@@ -8,6 +8,7 @@ import net.conczin.mca.Config;
 import net.dannyfather.mca_butchery.MCAButchery;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerBoobsModel;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModel;
+import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModelSlim;
 import net.dannyfather.mca_butchery.config.MCAButcheryCommonConfig;
 import net.dannyfather.mca_butchery.item.MCAButcheryItems;
 import net.dannyfather.mca_butchery.network.MCAButcheryNetwork;
@@ -22,6 +23,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.fml.ModList;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -29,6 +31,7 @@ import java.util.UUID;
 public class MCAVillagerCorpseItemRenderer extends BlockEntityWithoutLevelRenderer {
 
     private MCAVillagerCorpseModel<?> model;
+    private MCAVillagerCorpseModelSlim<?> slimModel;
     private MCAVillagerBoobsModel<?> bModel;
 
     private static final ResourceLocation DEFAULT_TEXTURE = ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "textures/entity/villager_corpse.png");
@@ -41,6 +44,7 @@ public class MCAVillagerCorpseItemRenderer extends BlockEntityWithoutLevelRender
     public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         if (this.model == null) {
             this.model = new MCAVillagerCorpseModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(MCAVillagerCorpseModel.LAYER_LOCATION));
+            this.slimModel = new MCAVillagerCorpseModelSlim<>(Minecraft.getInstance().getEntityModels().bakeLayer(MCAVillagerCorpseModelSlim.LAYER_LOCATION));
             this.bModel = new MCAVillagerBoobsModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(MCAVillagerBoobsModel.LAYER_LOCATION));
         }
 
@@ -49,6 +53,9 @@ public class MCAVillagerCorpseItemRenderer extends BlockEntityWithoutLevelRender
         Float hSize = stack.get(MCAButcheryItems.H_SIZE);
         Float wSize = stack.get(MCAButcheryItems.W_SIZE);
         Integer face = stack.get(MCAButcheryItems.FACE);
+        Boolean slim = stack.get(MCAButcheryItems.SLIM);
+
+
 
         poseStack.pushPose();
 
@@ -80,15 +87,29 @@ public class MCAVillagerCorpseItemRenderer extends BlockEntityWithoutLevelRender
             }
 
             case FIRST_PERSON_RIGHT_HAND  -> {
-                poseStack.mulPose(Axis.XP.rotationDegrees(90f));
-                poseStack.mulPose(Axis.ZP.rotationDegrees(90f));
-                poseStack.translate(-0.1F, -0.66F, -0.8F);
+                if(ModList.get().isLoaded("holdmyitemsnf")) {
+                    poseStack.translate(0.5f,0f,0.5f);
+                    poseStack.mulPose(Axis.YP.rotationDegrees(180f));
+                    poseStack.scale(0.4f,0.4f,0.4f);
+                    poseStack.translate(-0.1f,0.8f,-0.5f);
+                } else {
+                    poseStack.mulPose(Axis.XP.rotationDegrees(90f));
+                    poseStack.mulPose(Axis.ZP.rotationDegrees(90f));
+                    poseStack.translate(-0.1F, -0.66F, -0.8F);
+                }
             }
 
             case FIRST_PERSON_LEFT_HAND  -> {
-                poseStack.mulPose(Axis.XP.rotationDegrees(90f));
-                poseStack.mulPose(Axis.ZP.rotationDegrees(-90f));
-                poseStack.translate(-0.9F, 0.34F, -0.8F);
+                if(ModList.get().isLoaded("holdmyitemsnf")) {
+                    poseStack.translate(0.5f,0f,0.5f);
+                    poseStack.mulPose(Axis.YP.rotationDegrees(180f));
+                    poseStack.scale(0.4f,0.4f,0.4f);
+                    poseStack.translate(-0.9f,0.8f,-0.5f);
+                } else {
+                    poseStack.mulPose(Axis.XP.rotationDegrees(90f));
+                    poseStack.mulPose(Axis.ZP.rotationDegrees(-90f));
+                    poseStack.translate(-0.9F, 0.34F, -0.8F);
+                }
             }
 
             case FIXED -> {
@@ -98,7 +119,11 @@ public class MCAVillagerCorpseItemRenderer extends BlockEntityWithoutLevelRender
             }
 
         }
-        this.model.setVisibleParts(0);
+        if(slim != null && slim) {
+            this.slimModel.setVisibleParts(0);
+        } else {
+            this.model.setVisibleParts(0);
+        }
         VertexConsumer vertexConsumer;
 
         if(villager != null) {
@@ -138,7 +163,11 @@ public class MCAVillagerCorpseItemRenderer extends BlockEntityWithoutLevelRender
             poseStack.translate(-0.5F, 0F, -0.25F * wSize);
         }
 
-        model.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+        if(slim != null && slim) {
+            slimModel.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+        } else {
+            model.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+        }
         if(bSize != null) {
             boolean boobsEnabled = Config.loadOrCreate().enableBoobs;
             bModel.setVisible(bSize > 0 && boobsEnabled);

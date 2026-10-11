@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import java.util.UUID;
 
 public class DrainedMCAVillagercorpsebrokenProcedure {
-    public static void execute(LevelAccessor world, double x, double y, double z, BlockState blockstate, Entity entity, UUID uuid, String name, Float bSize, Float height, Float width, Integer face) {
+    public static void execute(LevelAccessor world, double x, double y, double z, BlockState blockstate, Entity entity, UUID uuid, String name, Float bSize, Float height, Float width, Integer face, Boolean slim) {
         if (entity == null)
             return;
         if ((blockstate.getBlock().getStateDefinition().getProperty("blockstate") instanceof IntegerProperty _getip1 ? blockstate.getValue(_getip1) : -1) == 0
@@ -39,6 +39,9 @@ public class DrainedMCAVillagercorpsebrokenProcedure {
                     }
                     if(face != null) {
                         corpseBE.setFace(face);
+                    }
+                    if(slim != null) {
+                        corpseBE.setSlim(slim);
                     }
                     corpseBE.setItemName(name);
                     ItemStack item = corpseBE.toItemStack();

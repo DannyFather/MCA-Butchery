@@ -67,6 +67,11 @@ public class MCAButcheryItems {
                     () -> DataComponentType.<Integer>builder().persistent(Codec.INT).build()
             );
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SLIM =
+            DATA_COMPONENTS.register("slim",
+                    () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
+            );
+
     private static DeferredItem<Item> block(DeferredHolder<Block, Block> block, Item.Properties properties) {
         return REGISTRY.register(block.getId().getPath(), () -> new BlockItem(block.get(), properties));
     }

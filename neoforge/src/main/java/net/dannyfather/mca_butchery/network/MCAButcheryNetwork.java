@@ -37,6 +37,12 @@ public class MCAButcheryNetwork {
         );
 
         registrar.playToServer(
+                UpdateSlimStatus.TYPE,
+                UpdateSlimStatus.STREAM_CODEC,
+                MCAButcheryNetwork::sendSlimStatus
+        );
+
+        registrar.playToServer(
                 UploadVillagerSkinPayload.TYPE,
                 UploadVillagerSkinPayload.STREAM_CODEC,
                 (payload, context) -> {
@@ -56,6 +62,12 @@ public class MCAButcheryNetwork {
                 DownloadVillagerSkinPayload.STREAM_CODEC,
                 MCAButcheryNetwork::handleSkinDownload
         );
+
+        registrar.playToClient(
+                VillagerSlimPayload.TYPE,
+                VillagerSlimPayload.STREAM_CODEC,
+                MCAButcheryNetwork::handleSlim
+        );
     }
 
     private static void handleSkinDownload(DownloadVillagerSkinPayload payload, IPayloadContext context) {
@@ -68,6 +80,15 @@ public class MCAButcheryNetwork {
         context.enqueueWork(() -> {
             if(context.player() instanceof ServerPlayer player){
                 MCAButcheryNetwork.sendVillagerSkin(player,payload.uuid());
+            }
+
+        });
+    }
+
+    private static void sendSlimStatus(UpdateSlimStatus payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if(context.player() instanceof ServerPlayer player){
+                player.getPersistentData().putBoolean("Slim", payload.slim());
             }
 
         });
@@ -108,6 +129,11 @@ public class MCAButcheryNetwork {
         });
     }
 
+    private static void handleSlim(VillagerSlimPayload payload,IPayloadContext context) {
+        context.enqueueWork(() -> {
+        });
+    }
+
     public static void sendVillagerSkin(ServerPlayer player, UUID uuid) {
         try {
             Path skinFile = player.server.getWorldPath(LevelResource.ROOT).resolve("data").resolve(MCAButchery.MOD_ID).resolve("skins").resolve(uuid.toString() + ".png");
@@ -123,4 +149,6 @@ public class MCAButcheryNetwork {
     public static void requestVillagerSkin(UUID uuid) {
         PacketDistributor.sendToServer(new RequestVillagerSkinPayload(uuid));
     }
+
+
 }

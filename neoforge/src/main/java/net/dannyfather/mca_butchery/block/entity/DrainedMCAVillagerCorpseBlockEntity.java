@@ -31,6 +31,7 @@ public class DrainedMCAVillagerCorpseBlockEntity extends RandomizableContainerBl
     private Float hSize = 1f;
     private Float wSize = 1f;
     private Integer face = 0;
+    private Boolean slim = false;
 
     public DrainedMCAVillagerCorpseBlockEntity(BlockPos position, BlockState state) {
         super(MCAButcheryBlockEntities.DRAINEDMCAVILLAGERCORPSE.get(), position, state);
@@ -113,6 +114,19 @@ public class DrainedMCAVillagerCorpseBlockEntity extends RandomizableContainerBl
         return this.face;
     }
 
+    public void setSlim(boolean slim) {
+        this.slim = slim;
+        setChanged();
+
+        if (this.level != null && !this.level.isClientSide) {
+            this.level.sendBlockUpdated(this.worldPosition,this.getBlockState(),this.getBlockState(),3);
+        }
+    }
+
+    public Boolean getSlim() {
+        return this.slim;
+    }
+
     @Override
     public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookupProvider) {
         super.loadAdditional(compound, lookupProvider);
@@ -142,6 +156,10 @@ public class DrainedMCAVillagerCorpseBlockEntity extends RandomizableContainerBl
 
         if(compound.contains("Face")) {
             this.setFace(compound.getInt("Face"));
+        }
+
+        if(compound.contains("Slim")) {
+            this.setSlim(compound.getBoolean("Slim"));
         }
     }
 
@@ -173,7 +191,11 @@ public class DrainedMCAVillagerCorpseBlockEntity extends RandomizableContainerBl
         }
 
         if(this.getFace() != null) {
-            compound.putFloat("Face", this.getFace());
+            compound.putInt("Face", this.getFace());
+        }
+
+        if(this.getSlim() != null) {
+            compound.putBoolean("Slim", this.getSlim());
         }
     }
 
@@ -270,6 +292,10 @@ public class DrainedMCAVillagerCorpseBlockEntity extends RandomizableContainerBl
 
         if(this.getFace() != null) {
             stack.set(MCAButcheryItems.FACE, this.getFace());
+        }
+
+        if(this.getSlim() != null) {
+            stack.set(MCAButcheryItems.SLIM, this.getSlim());
         }
 
         return stack;

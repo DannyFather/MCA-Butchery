@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.extensions.common.IClientBlockExtensions;
 
 public class MCAButcheryClientBlockExtensions implements IClientBlockExtensions {
@@ -39,23 +40,32 @@ public class MCAButcheryClientBlockExtensions implements IClientBlockExtensions 
 
     @Override
     public boolean addHitEffects(BlockState state, Level level, HitResult target, ParticleEngine manager) {
+        if (!(target instanceof net.minecraft.world.phys.BlockHitResult hit)) {
+            return false;
+        }
+
         BlockState particleState = Blocks.NETHER_WART_BLOCK.defaultBlockState();
 
         RandomSource random = level.getRandom();
-        BlockPos pos = new BlockPos((int) target.getLocation().x,(int) target.getLocation().y,(int) target.getLocation().z);
+        Vec3 pos = hit.getLocation();
+        net.minecraft.core.Direction face = hit.getDirection();
 
-        for (int i = 0; i < 2; i++) {
-            double scale = 0.0002;
-            double x = pos.getX() - 0.5 + random.nextDouble() * scale;
-            double y = pos.getY() + 0.7 + random.nextDouble() * scale;
-            double z = pos.getZ() - 0.5 + random.nextDouble() * scale;
+            double jitterX = (random.nextDouble() - 0.5) * 0.7;
+            double jitterY = (random.nextDouble() - 0.5) * 0.7;
+            double jitterZ = (random.nextDouble() - 0.5) * 0.7;
 
-            double vx = (random.nextDouble()) * scale;
-            double vy = (random.nextDouble()) * scale;
-            double vz = (random.nextDouble()) * scale;
+            // Keep particles on the hit face, with slight outward offset.
+            double x = pos.x() + (face.getAxis() != net.minecraft.core.Direction.Axis.X ? jitterX : 0) + face.getStepX() * 0.01;
+            double y = pos.y() + (face.getAxis() != net.minecraft.core.Direction.Axis.Y ? jitterY : 0) + face.getStepY() * 0.01;
+            double z = pos.z() + (face.getAxis() != net.minecraft.core.Direction.Axis.Z ? jitterZ : 0) + face.getStepZ() * 0.01;
 
-            level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK,particleState), x, y, z, vx, vy, vz);
-        }
+            // Small burst moving away from the block face.
+            double vx = face.getStepX() * 0.05 + (random.nextDouble() - 0.5) * 0.04;
+            double vy = face.getStepY() * 0.05 + (random.nextDouble() - 0.5) * 0.04;
+            double vz = face.getStepZ() * 0.05 + (random.nextDouble() - 0.5) * 0.04;
+
+            level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, particleState), x, y, z, vx, vy, vz);
+
         return true;
     }
 

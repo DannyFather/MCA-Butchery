@@ -3,22 +3,20 @@ package net.dannyfather.mca_butchery.network;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.conczin.mca.client.resources.SkinExporter;
 import net.conczin.mca.entity.VillagerEntityMCA;
-import net.conczin.mca.entity.VillagerLike;
 import net.conczin.mca.entity.ai.Genetics;
 import net.dannyfather.mca_butchery.MCAButchery;
 import net.dannyfather.mca_butchery.client.ClientSkinCache;
-import net.dannyfather.mca_butchery.client.CorpseTexture;
 import net.dannyfather.mca_butchery.config.MCAButcheryCommonConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.HttpTexture;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.LevelResource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -27,11 +25,15 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @EventBusSubscriber(modid = MCAButchery.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class MCAButcheryClientNetwork {
@@ -45,6 +47,12 @@ public class MCAButcheryClientNetwork {
                 RequestVillagerSkinPayload.TYPE,
                 RequestVillagerSkinPayload.STREAM_CODEC,
                 MCAButcheryClientNetwork::handleSkinRequest
+        );
+
+        registrar.playToServer(
+                UpdateSlimStatus.TYPE,
+                UpdateSlimStatus.STREAM_CODEC,
+                MCAButcheryClientNetwork::sendSlimStatus
         );
 
         registrar.playToServer(
@@ -66,6 +74,12 @@ public class MCAButcheryClientNetwork {
                 DownloadVillagerSkinPayload.TYPE,
                 DownloadVillagerSkinPayload.STREAM_CODEC,
                 MCAButcheryClientNetwork::handleSkinDownload
+        );
+
+        registrar.playToClient(
+                VillagerSlimPayload.TYPE,
+                VillagerSlimPayload.STREAM_CODEC,
+                MCAButcheryClientNetwork::handleSlim
         );
     }
 
@@ -96,17 +110,70 @@ public class MCAButcheryClientNetwork {
                     }
                 } else if (entity instanceof AbstractClientPlayer player) {
                     if (payload.model() == 1 || payload.model() == 2) {
-                        PlayerSkin playerSkin = player.getSkin();
-                        ResourceLocation skinLocation = playerSkin.texture();
-                        try (NativeImage skinImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(skinLocation).open())) {
-                            PacketDistributor.sendToServer(new UploadVillagerSkinPayload(skinImage.asByteArray(), player.getUUID()));
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
+                        Minecraft.getInstance().getSkinManager().getOrLoad(player.getGameProfile())
+                                .thenAccept(skin -> {
+                                    String url = skin.textureUrl();
+                                    if (url == null || url.isBlank()) {
+                                        return;
+                                    }
+                                    CompletableFuture.runAsync(() -> {
+                                        try (InputStream in = URI.create(url).toURL().openStream();
+                                             NativeImage image = NativeImage.read(in)) {
+                                            byte[] png = image.asByteArray();
+                                            if(image.getHeight() != 64 || image.getWidth() != 64){
+                                                png = to64x64Png(image);
+                                            }
+                                            byte[] finalPng = png;
+                                            Minecraft.getInstance().execute(() -> {
+                                                PacketDistributor.sendToServer(new UploadVillagerSkinPayload(finalPng, player.getUUID()));
+
+                                                System.out.println("Uploaded skin PNG: " + finalPng.length + " bytes");
+                                            });
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    });
+                                })
+                                .exceptionally(error -> {
+                                    error.printStackTrace();
+                                    return null;
+                                });
                     }
                 }
             }
         });
+    }
+
+    public static byte[] to64x64Png(NativeImage source) throws IOException {
+        BufferedImage image = new BufferedImage(
+                64, 64, BufferedImage.TYPE_INT_ARGB
+        );
+
+        int srcWidth = source.getWidth();
+        int srcHeight = source.getHeight();
+
+        for (int y = 0; y < 64; y++) {
+            for (int x = 0; x < 64; x++) {
+                int srcX = (y < 48 ? x : (y < 52) ? ( (x >= 20 && x < 24) ? (27 - x) : ((x >= 24 && x < 28) ? (35 - x) : ( (x >= 36 && x < 40) ? (83 - x) : ((x >= 40 && x < 44) ? (91 - x) : 16))) )
+                        : ( (x >= 16 && x < 28)  ? (27 - x) : ((x >= 28 && x < 32) ? (43 - x) : (x >= 32 && x < 44) ? (83 - x) : ((x >= 44 &  x < 48) ? 99 - x : x))) ) * srcWidth / 64;
+                int srcY = y % srcHeight;
+                int abgr = source.getPixelRGBA(srcX, srcY);
+                int argb = (abgr & 0xFF00FF00) | ((abgr & 0x00FF0000) >> 16) | ((abgr & 0x000000FF) << 16);
+
+                if(y >= srcHeight) {
+                    if (y < 48 || (x < 16 || x >= 48)) {
+                        argb = 0;
+                    }
+                }
+
+                image.setRGB(x, y, argb);
+            }
+        }
+
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ImageIO.write(image, "PNG", out);
+        return out.toByteArray();
     }
 
     private static void handleVillagerSkin(VillagerSkinPayload payload,IPayloadContext context) {
@@ -122,6 +189,23 @@ public class MCAButcheryClientNetwork {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        });
+    }
+
+    private static void handleSlim(VillagerSlimPayload payload,IPayloadContext context) {
+        context.enqueueWork(()-> {
+            ClientLevel level = Minecraft.getInstance().level;
+            if (level != null) {
+                Entity entity = level.getEntity(payload.entityId());
+                if (entity instanceof AbstractClientPlayer player) {
+                    if (player.getSkin().model() == PlayerSkin.Model.SLIM) {
+                        PacketDistributor.sendToServer(new UpdateSlimStatus(true));
+                    } else {
+                        PacketDistributor.sendToServer(new UpdateSlimStatus(false));
+                    }
+                }
+            }
+
         });
     }
 
@@ -165,5 +249,14 @@ public class MCAButcheryClientNetwork {
             }
         }
         return result;
+    }
+
+    private static void sendSlimStatus(UpdateSlimStatus payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if(context.player() instanceof ServerPlayer player){
+                player.getPersistentData().putBoolean("Slim", payload.slim());
+            }
+
+        });
     }
 }

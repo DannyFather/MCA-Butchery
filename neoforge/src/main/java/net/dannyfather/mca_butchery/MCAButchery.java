@@ -99,6 +99,16 @@ public class MCAButchery {
                     MCAVillagerBoobsModel.LAYER_LOCATION,
                     MCAVillagerBoobsModel::createBodyLayer
             );
+
+            event.registerLayerDefinition(
+                    MCAVillagerCorpseModelSlim.LAYER_LOCATION,
+                    MCAVillagerCorpseModelSlim::createBodyLayer
+            );
+
+            event.registerLayerDefinition(
+                    MCAVillagerCorpseHangingModelSlim.LAYER_LOCATION,
+                    MCAVillagerCorpseHangingModelSlim::createBodyLayer
+            );
         }
 
         @SubscribeEvent
