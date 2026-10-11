@@ -194,6 +194,7 @@ public class PlacemcavillagercorpseProcedure {
                             Float hSize = corpseStack.get(MCAButcheryItems.H_SIZE);
                             Float wSize = corpseStack.get(MCAButcheryItems.W_SIZE);
                             Integer face = corpseStack.get(MCAButcheryItems.FACE);
+                            Boolean slim = corpseStack.get(MCAButcheryItems.SLIM);
 
                             if (uuid != null) {
                                 corpse.setVillager(uuid);
@@ -217,6 +218,10 @@ public class PlacemcavillagercorpseProcedure {
 
                             if (face != null) {
                                 corpse.setFace(face);
+                            }
+
+                            if (slim != null) {
+                                corpse.setSlim(slim);
                             }
                         }
                     }
@@ -389,6 +394,8 @@ public class PlacemcavillagercorpseProcedure {
                             Float hSize = corpseStack.get(MCAButcheryItems.H_SIZE);
                             Float wSize = corpseStack.get(MCAButcheryItems.W_SIZE);
                             Integer face = corpseStack.get(MCAButcheryItems.FACE);
+                            Boolean slim = corpseStack.get(MCAButcheryItems.SLIM);
+
                             if (uuid != null) {
                                 corpse.setVillager(uuid);
                             }
@@ -406,6 +413,9 @@ public class PlacemcavillagercorpseProcedure {
                             }
                             if(face != null) {
                                 corpse.setFace(face);
+                            }
+                            if(slim != null) {
+                                corpse.setSlim(slim);
                             }
                         }
                     }

@@ -8,10 +8,7 @@ import net.conczin.mca.Config;
 import net.dannyfather.mca_butchery.MCAButchery;
 import net.dannyfather.mca_butchery.block.DrainedMCAVillagerCorpseBlock;
 import net.dannyfather.mca_butchery.block.entity.DrainedMCAVillagerCorpseBlockEntity;
-import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerBoobsModel;
-import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseHangingModel;
-import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModel;
-import net.dannyfather.mca_butchery.block.entity.models.OrgansandBonesHangingModel;
+import net.dannyfather.mca_butchery.block.entity.models.*;
 import net.dannyfather.mca_butchery.client.ClientSkinCache;
 import net.dannyfather.mca_butchery.client.CorpseTexture;
 import net.dannyfather.mca_butchery.network.MCAButcheryClientNetwork;
@@ -31,6 +28,8 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
 
     private final MCAVillagerCorpseModel model;
     private final MCAVillagerCorpseHangingModel hangingModel;
+    private final MCAVillagerCorpseModelSlim slimModel;
+    private final MCAVillagerCorpseHangingModelSlim slimHangingModel;
     private final OrgansandBonesHangingModel organsandBonesHangingModel;
     private final MCAVillagerBoobsModel villagerBoobsModel;
 
@@ -47,6 +46,8 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
     public DrainedMCAVillagercorpseBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         this.model = new MCAVillagerCorpseModel(context.bakeLayer(MCAVillagerCorpseModel.LAYER_LOCATION));
         this.hangingModel = new MCAVillagerCorpseHangingModel<>(context.bakeLayer(MCAVillagerCorpseHangingModel.LAYER_LOCATION));
+        this.slimModel = new MCAVillagerCorpseModelSlim(context.bakeLayer(MCAVillagerCorpseModelSlim.LAYER_LOCATION));
+        this.slimHangingModel = new MCAVillagerCorpseHangingModelSlim(context.bakeLayer(MCAVillagerCorpseHangingModelSlim.LAYER_LOCATION));
         this.organsandBonesHangingModel = new OrgansandBonesHangingModel<>(context.bakeLayer(OrgansandBonesHangingModel.LAYER_LOCATION));
         this.villagerBoobsModel = new MCAVillagerBoobsModel<>(context.bakeLayer(MCAVillagerBoobsModel.LAYER_LOCATION));
     }
@@ -59,6 +60,7 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
         Float hSize = blockEntity.getHeight();
         Float wSize = blockEntity.getWidth();
         Integer face = blockEntity.getFace();
+        Boolean slim = blockEntity.getSlim();
 
         poseStack.pushPose();
 
@@ -120,9 +122,14 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
 
 
         organsandBonesHangingModel.setVisibleParts(state);
-        model.setVisibleParts(state);
-        hangingModel.setVisibleParts(state);
 
+        if(slim) {
+            slimModel.setVisibleParts(state);
+            slimHangingModel.setVisibleParts(state);
+        } else {
+            model.setVisibleParts(state);
+            hangingModel.setVisibleParts(state);
+        }
 
         boolean boobsEnabled = Config.loadOrCreate().enableBoobs;
         villagerBoobsModel.setVisible(bSize > 0 && boobsEnabled);
@@ -135,7 +142,11 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
                 poseStack.scale(wSize,hSize,wSize);
                 poseStack.translate(-0.5F, 0F, -0.25F * wSize);
                 poseStack.translate(0f,0.006f,-0.0234f);
-                model.renderToBuffer(poseStack, drainedConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+                if(slim) {
+                    slimModel.renderToBuffer(poseStack, drainedConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+                } else {
+                    model.renderToBuffer(poseStack, drainedConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+                }
                 poseStack.translate(0.5F, 0.8F, 0.5F);
                 poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
                 poseStack.translate(-0.5f, -0.98F, -0.5f);
@@ -151,7 +162,11 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
                 poseStack.scale(wSize,hSize,wSize);
                 poseStack.translate(-0.5F, -0.7F, -0.5F);
                 poseStack.translate(0f,0.006f,0.0075f);
-                hangingModel.renderToBuffer(poseStack, drainedConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+                if(slim) {
+                    slimHangingModel.renderToBuffer(poseStack, drainedConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+                } else {
+                    hangingModel.renderToBuffer(poseStack, drainedConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+                }
                 poseStack.translate(0.5F, 1F, 0.5F);
                 poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
                 poseStack.translate(-0.5f, -1F, -0.49f);
@@ -161,28 +176,28 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
 
             case 2,3,4,5,6 -> {
                 CorpseTexture bloodyTexture = new CorpseTexture("corpse_bloody_" + villager,chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,true,true);
-                cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, bloodyTexture.getLocation(),true, bSize, hSize, wSize);
+                cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, bloodyTexture.getLocation(),true, bSize, hSize, wSize, slim);
             }
 
             case 7,8,9,10,20 -> {
                 CorpseTexture cutOpenTexture = new CorpseTexture("corpse_cut_open_"+ villager ,chosenSkin,cutOpenBlood,cutOpenMask,cutOpenBloodMask,true,true);
-                cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, cutOpenTexture.getLocation(),true, bSize, hSize, wSize);
+                cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, cutOpenTexture.getLocation(),true, bSize, hSize, wSize, slim);
             }
 
             case 11,12,13 -> {
                 CorpseTexture bloodyTexture = new CorpseTexture("corpse_bloody_" + villager,chosenSkin,bloodSplatter,clothingMask,bloodSplatterMask,true,true);
-                cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, bloodyTexture.getLocation(),false, bSize, hSize, wSize);
+                cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, bloodyTexture.getLocation(),false, bSize, hSize, wSize, slim);
             }
 
             case 14,15,16,17,19 -> {
                 CorpseTexture cutOpenTexture = new CorpseTexture("corpse_cut_open_"+ villager ,chosenSkin,cutOpenBlood,cutOpenMask,cutOpenBloodMask,true,true);
-                cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, cutOpenTexture.getLocation(),false, bSize, hSize, wSize);
+                cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, cutOpenTexture.getLocation(),false, bSize, hSize, wSize, slim);
             }
 
             case 18 -> {
                 CorpseTexture cutOpenTexture = new CorpseTexture("corpse_cut_open_"+ villager ,chosenSkin,cutOpenBlood,cutOpenMask,cutOpenBloodMask,true,true);
                 villagerBoobsModel.setVisible(false);
-                cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, cutOpenTexture.getLocation(),false, bSize, hSize, wSize);
+                cutOpen(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, cutOpenTexture.getLocation(),false, bSize, hSize, wSize, slim);
             }
 
 
@@ -193,7 +208,7 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
 
     }
 
-    private void cutOpen(DrainedMCAVillagerCorpseBlockEntity blockEntity,PoseStack poseStack,MultiBufferSource bufferSource ,int packedLight, int packedOverlay, ResourceLocation resourceLocation,boolean hanging, Float bSize, Float hSize, Float wSize) {
+    private void cutOpen(DrainedMCAVillagerCorpseBlockEntity blockEntity,PoseStack poseStack,MultiBufferSource bufferSource ,int packedLight, int packedOverlay, ResourceLocation resourceLocation,boolean hanging, Float bSize, Float hSize, Float wSize, Boolean slim) {
         Direction facingInternals = blockEntity.getBlockState().getValue(DrainedMCAVillagerCorpseBlock.FACING);
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(resourceLocation));
         if(hanging) {
@@ -201,7 +216,11 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
             poseStack.scale(wSize,hSize,wSize);
             poseStack.translate(-0.5F, -0.7F, -0.5F);
             poseStack.translate(0f,0.006f,0.0075f);
-            hangingModel.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+            if(slim) {
+                slimHangingModel.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+            } else {
+                hangingModel.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+            }
             poseStack.translate(0.5F, 1F, 0.5F);
             poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
             poseStack.translate(-0.5f, -1F, -0.49f);
@@ -211,7 +230,11 @@ public class DrainedMCAVillagercorpseBlockEntityRenderer implements BlockEntityR
             poseStack.scale(wSize,hSize,wSize);
             poseStack.translate(-0.5F, 0F, -0.25F * wSize);
             poseStack.translate(0f,0.006f,-0.0234f);
-            model.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+            if(slim) {
+                slimModel.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+            } else {
+                model.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+            }
             poseStack.translate(0.5F, 0.8F, 0.5F);
             poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
             poseStack.translate(-0.5f, -0.98F, -0.5f);

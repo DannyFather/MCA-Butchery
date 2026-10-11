@@ -107,6 +107,7 @@ public class HangingmcavillagercutupProcedure {
                                 Float hSize = corpse.getHeight();
                                 Float wSize = corpse.getWidth();
                                 Integer face = corpse.getFace();
+                                Boolean slim = corpse.getSlim();
 
 
                                 ItemStack item = MCAButcheryItems.MCAVILLAGERHEAD.toStack();
@@ -131,6 +132,9 @@ public class HangingmcavillagercutupProcedure {
                                 }
                                 if(face != null) {
                                     item.set(MCAButcheryItems.FACE, face);
+                                }
+                                if(slim != null) {
+                                    item.set(MCAButcheryItems.SLIM, slim);
                                 }
                                 Containers.dropItemStack(serverLevel, pos.getX(), pos.getY(), pos.getZ(), item);
                             }
