@@ -19,14 +19,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -35,10 +39,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class MCAVillagerHeadBlock extends Block implements EntityBlock {
+public class MCAVillagerHeadBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
     public static final IntegerProperty BLOCKSTATE = IntegerProperty.create("blockstate", 0, 1);
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final IntegerProperty ROTATION = IntegerProperty.create("rotation", 0, 15);
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     public MCAVillagerHeadBlock() {
         super(BlockBehaviour.Properties.of().sound(SoundType.STONE).strength(1f, 10f).lightLevel(s -> (new Object() {
@@ -82,20 +87,21 @@ public class MCAVillagerHeadBlock extends Block implements EntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(FACING, BLOCKSTATE, ROTATION);
+        builder.add(FACING, BLOCKSTATE, ROTATION, WATERLOGGED);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction clickedFace = context.getClickedFace();
         float yaw = context.getRotation();
-
         int rotation = Mth.floor((yaw + 11.25f)/22.5f) & 15;
+        FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
 
         return super.getStateForPlacement(context)
                 .setValue(FACING, clickedFace.getAxis().isHorizontal() ? clickedFace : Direction.NORTH)
                 .setValue(BLOCKSTATE, clickedFace.getAxis().isHorizontal() ? 1 : 0)
-                .setValue(ROTATION, rotation);
+                .setValue(ROTATION, rotation).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+
     }
 
     public BlockState rotate(BlockState state, Rotation rot) {
@@ -224,5 +230,20 @@ public class MCAVillagerHeadBlock extends Block implements EntityBlock {
             level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, particleState), x, y, z, vx, vy, vz);
         }
         return true;
+    }
+
+    @Override
+    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+
+        if(state.getValue(WATERLOGGED)) {
+            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        }
+
+        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+    }
+
+    @Override
+    protected FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 }

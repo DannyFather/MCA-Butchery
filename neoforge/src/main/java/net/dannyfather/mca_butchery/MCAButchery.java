@@ -3,10 +3,12 @@ package net.dannyfather.mca_butchery;
 import com.mojang.logging.LogUtils;
 import net.dannyfather.mca_butchery.block.MCAButcheryBlocks;
 import net.dannyfather.mca_butchery.block.entity.MCAButcheryBlockEntities;
+import net.dannyfather.mca_butchery.block.entity.PikeBlockEntity;
 import net.dannyfather.mca_butchery.block.entity.models.*;
 import net.dannyfather.mca_butchery.block.entity.renderer.DrainedMCAVillagercorpseBlockEntityRenderer;
 import net.dannyfather.mca_butchery.block.entity.renderer.MCAVillagerHeadBlockEntityRenderer;
 import net.dannyfather.mca_butchery.block.entity.renderer.MCAVillagerCorpseBlockEntityRenderer;
+import net.dannyfather.mca_butchery.block.entity.renderer.PikeBlockEntityRenderer;
 import net.dannyfather.mca_butchery.client.*;
 import net.dannyfather.mca_butchery.config.MCAButcheryCommonConfig;
 import net.dannyfather.mca_butchery.item.MCAButcheryItems;
@@ -51,10 +53,7 @@ public class MCAButchery {
         MCAButcheryBlocks.REGISTRY.register(modEventBus);
         MCAButcheryBlockEntities.REGISTRY.register(modEventBus);
 
-        modContainer.registerConfig(
-                ModConfig.Type.COMMON,
-                MCAButcheryCommonConfig.SPEC
-        );
+        modContainer.registerConfig(ModConfig.Type.COMMON,MCAButcheryCommonConfig.SPEC);
 
         MCAButcheryItems.DATA_COMPONENTS.register(modEventBus);
     }
@@ -126,6 +125,11 @@ public class MCAButchery {
             event.registerBlockEntityRenderer(
                     MCAButcheryBlockEntities.MCAVILLAGERHEAD.get(),
                     MCAVillagerHeadBlockEntityRenderer::new
+            );
+
+            event.registerBlockEntityRenderer(
+                    MCAButcheryBlockEntities.PIKE.get(),
+                    PikeBlockEntityRenderer::new
             );
 
         }

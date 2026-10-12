@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.fml.ModList;
 
 import java.util.UUID;
 
@@ -75,6 +76,25 @@ public class MCAVillagerHeadItemRenderer extends BlockEntityWithoutLevelRenderer
                 poseStack.translate(0.5f,0f,0.5f);
                 poseStack.mulPose(Axis.YP.rotationDegrees(180f));
                 poseStack.translate(-0.5f,0.25f,-0.5f);
+            }
+
+            case FIRST_PERSON_RIGHT_HAND -> {
+                if(ModList.get().isLoaded("holdmyitemsnf")) {
+                    poseStack.translate(0.5f,0f,0.5f);
+                    poseStack.mulPose(Axis.YP.rotationDegrees(180f));
+                    poseStack.scale(0.4f,0.4f,0.4f);
+                    poseStack.mulPose(Axis.YP.rotationDegrees(90f));
+                    poseStack.translate(-0.5f,0.8f,-0.1f);
+                }
+            }
+
+            case FIRST_PERSON_LEFT_HAND -> {
+                if(ModList.get().isLoaded("holdmyitemsnf")) {
+                    poseStack.translate(0.5f,0f,0.5f);
+                    poseStack.scale(0.4f,0.4f,0.4f);
+                    poseStack.mulPose(Axis.YP.rotationDegrees(90f));
+                    poseStack.translate(-0.5f,0.8f,-0.1f);
+                }
             }
 
 

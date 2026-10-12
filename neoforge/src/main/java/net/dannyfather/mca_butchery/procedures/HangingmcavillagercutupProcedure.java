@@ -121,9 +121,6 @@ public class HangingmcavillagercutupProcedure {
                                 if(villager != null) {
                                     item.set(MCAButcheryItems.VILLAGER_UUID, villager);
                                 }
-                                if(bSize != null) {
-                                    item.set(MCAButcheryItems.B_SIZE, bSize);
-                                }
                                 if(hSize != null) {
                                     item.set(MCAButcheryItems.H_SIZE, hSize);
                                 }
@@ -132,9 +129,6 @@ public class HangingmcavillagercutupProcedure {
                                 }
                                 if(face != null) {
                                     item.set(MCAButcheryItems.FACE, face);
-                                }
-                                if(slim != null) {
-                                    item.set(MCAButcheryItems.SLIM, slim);
                                 }
                                 Containers.dropItemStack(serverLevel, pos.getX(), pos.getY(), pos.getZ(), item);
                             }

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hasfenceabove=0": {
+      "model": "mca_butchery:block/pike"
+    },
+    "hasfenceabove=1": {
+      "model": "mca_butchery:block/pike_fence"
+    }
+  }
+}

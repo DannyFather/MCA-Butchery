@@ -28,6 +28,7 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
     private String customName;
     private Float wSize = 1f;
     private Float hSize = 1f;
+    private Integer face = 0;
 
     public MCAVillagerHeadBlockEntity(BlockPos position, BlockState state) {
         super(MCAButcheryBlockEntities.MCAVILLAGERHEAD.get(), position, state);
@@ -85,6 +86,19 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
         return this.wSize;
     }
 
+    public void setFace(Integer face) {
+        this.face = face;
+        setChanged();
+
+        if (this.level != null && !this.level.isClientSide) {
+            this.level.sendBlockUpdated(this.worldPosition,this.getBlockState(),this.getBlockState(),3);
+        }
+    }
+
+    public Integer getFace() {
+        return this.face;
+    }
+
     @Override
     public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookupProvider) {
         super.loadAdditional(compound, lookupProvider);
@@ -106,6 +120,10 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
 
         if (compound.contains("W_Size")) {
             this.setWidth(compound.getFloat("W_Size"));
+        }
+
+        if (compound.contains("Face")) {
+            this.setFace(compound.getInt("Face"));
         }
     }
 
@@ -131,6 +149,10 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
         if(this.getWidth() != null) {
             compound.putFloat("W_Size", this.getWidth());
         }
+
+        if(this.getFace() != null) {
+            compound.putInt("Face", this.getFace());
+        }
     }
 
     public ItemStack toItemStack() {
@@ -150,6 +172,10 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
 
         if(this.getWidth() != null) {
             stack.set(MCAButcheryItems.W_SIZE, this.getWidth());
+        }
+
+        if(this.getFace() != null) {
+            stack.set(MCAButcheryItems.FACE, this.getFace());
         }
 
         return stack;

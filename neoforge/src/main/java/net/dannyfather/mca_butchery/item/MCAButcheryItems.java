@@ -38,6 +38,7 @@ public class MCAButcheryItems {
     public static final DeferredItem<Item> DRAINEDMCAVILLAGERCORPSE = block(MCAButcheryBlocks.DRAINEDMCAVILLAGERCORPSE, new Item.Properties().stacksTo(16));
     public static final DeferredItem<Item> MCAVILLAGERHEAD = REGISTRY.register("villager_head",
             () -> new MCAVillagerHeadItem(MCAButcheryBlocks.MCAVILLAGERHEAD.get(), new Item.Properties()));
+    public static final DeferredItem<Item> PIKE = block(MCAButcheryBlocks.PIKE, new Item.Properties());
 
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS =
             DeferredRegister.create(Registries.DATA_COMPONENT_TYPE,MCAButchery.MOD_ID);
