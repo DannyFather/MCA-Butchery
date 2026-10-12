@@ -1,6 +1,7 @@
 package net.dannyfather.mca_butchery;
 
 import com.mojang.logging.LogUtils;
+import de.bene2212.holdmyitemsnf.config.HoldMyItemsClientConfig;
 import net.dannyfather.mca_butchery.block.MCAButcheryBlocks;
 import net.dannyfather.mca_butchery.block.entity.MCAButcheryBlockEntities;
 import net.dannyfather.mca_butchery.block.entity.PikeBlockEntity;
@@ -27,9 +28,12 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
@@ -38,6 +42,8 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import org.slf4j.Logger;
+
+import java.util.List;
 
 @Mod(MCAButchery.MOD_ID)
 public class MCAButchery {
@@ -62,12 +68,25 @@ public class MCAButchery {
     public void onRegisterPayloadHandlers(RegisterPayloadHandlersEvent event) {
     }
 
+
+
     @EventBusSubscriber(modid = MOD_ID,bus = EventBusSubscriber.Bus.MOD,value = Dist.CLIENT)
     public static class ClientModEvents {
 
         private static MCAVillagerCorpseItemRenderer corpseItemRenderer;
         private static DrainedMCAVillagerCorpseItemRenderer drainedCorpseItemRenderer;
         private static MCAVillagerHeadItemRenderer headItemRenderer;
+
+        @SubscribeEvent
+        public static void clientSetup(FMLClientSetupEvent event) {
+            if(ModList.get().isLoaded("holdmyitemsnf")) {
+                List<String> itemRenders = (List) HoldMyItemsClientConfig.RENDER_BLOCK_AS_ITEM.get();
+                itemRenders.add(MCAButchery.MOD_ID + ":villager_corpse");
+                itemRenders.add(MCAButchery.MOD_ID + ":drained_villager_corpse");
+                itemRenders.add(MCAButchery.MOD_ID + ":villager_head");
+                HoldMyItemsClientConfig.RENDER_BLOCK_AS_ITEM.set(itemRenders);
+            }
+        }
 
         @SubscribeEvent
         public static void registerLayerDefinitions(

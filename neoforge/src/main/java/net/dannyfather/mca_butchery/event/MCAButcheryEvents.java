@@ -241,14 +241,6 @@ public class MCAButcheryEvents {
     public static void commonSetup(FMLCommonSetupEvent event) {
         ButcheryconfigConfiguration.VILLAGER_CORPSE.set(false);
         ButcheryconfigConfiguration.PLAYER_CORPSE.set(false);
-
-        if(ModList.get().isLoaded("holdmyitemsnf")) {
-            List<String> itemRenders = (List) HoldMyItemsClientConfig.RENDER_BLOCK_AS_ITEM.get();
-            itemRenders.add(MCAButchery.MOD_ID + ":villager_corpse");
-            itemRenders.add(MCAButchery.MOD_ID + ":drained_villager_corpse");
-            itemRenders.add(MCAButchery.MOD_ID + ":villager_head");
-            HoldMyItemsClientConfig.RENDER_BLOCK_AS_ITEM.set(itemRenders);
-        }
     }
 
 }
