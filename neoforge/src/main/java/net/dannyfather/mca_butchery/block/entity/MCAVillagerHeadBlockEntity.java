@@ -29,6 +29,7 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
     private Float wSize = 1f;
     private Float hSize = 1f;
     private Integer face = 0;
+    private Integer decayState = 0;
 
     public MCAVillagerHeadBlockEntity(BlockPos position, BlockState state) {
         super(MCAButcheryBlockEntities.MCAVILLAGERHEAD.get(), position, state);
@@ -99,6 +100,19 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
         return this.face;
     }
 
+    public void setDecayState(Integer decayState) {
+        this.decayState = decayState;
+        setChanged();
+
+        if (this.level != null && !this.level.isClientSide) {
+            this.level.sendBlockUpdated(this.worldPosition,this.getBlockState(),this.getBlockState(),3);
+        }
+    }
+
+    public Integer getDecayState() {
+        return this.decayState;
+    }
+
     @Override
     public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookupProvider) {
         super.loadAdditional(compound, lookupProvider);
@@ -124,6 +138,10 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
 
         if (compound.contains("Face")) {
             this.setFace(compound.getInt("Face"));
+        }
+
+        if (compound.contains("DecayState")) {
+            this.setDecayState(compound.getInt("DecayState"));
         }
     }
 
@@ -153,6 +171,10 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
         if(this.getFace() != null) {
             compound.putInt("Face", this.getFace());
         }
+
+        if(this.getDecayState() != null) {
+            compound.putInt("DecayState", this.getDecayState());
+        }
     }
 
     public ItemStack toItemStack() {
@@ -176,6 +198,10 @@ public class MCAVillagerHeadBlockEntity extends RandomizableContainerBlockEntity
 
         if(this.getFace() != null) {
             stack.set(MCAButcheryItems.FACE, this.getFace());
+        }
+
+        if(this.getDecayState() != null) {
+            stack.set(MCAButcheryItems.DECAY_STATE, this.getDecayState());
         }
 
         return stack;

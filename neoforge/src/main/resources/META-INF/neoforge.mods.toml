@@ -44,7 +44,7 @@ side = "BOTH"
 [[dependencies.mca_butchery]]
 modId = "butchery"
 type = "required"
-versionRange = "[5.2,)"
+versionRange = "[5.3,)"
 ordering = "AFTER"
 side = "BOTH"
 

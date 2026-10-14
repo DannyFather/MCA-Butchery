@@ -9,6 +9,7 @@ import net.dannyfather.mca_butchery.MCAButchery;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerBoobsModel;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModel;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerCorpseModelSlim;
+import net.dannyfather.mca_butchery.block.entity.renderer.DrainedMCAVillagercorpseBlockEntityRenderer;
 import net.dannyfather.mca_butchery.item.MCAButcheryItems;
 import net.dannyfather.mca_butchery.network.MCAButcheryNetwork;
 import net.minecraft.client.Minecraft;
@@ -117,69 +118,12 @@ public class DrainedMCAVillagerCorpseItemRenderer extends BlockEntityWithoutLeve
         }
 
         if(slim != null && slim){
-            this.slimModel.setVisibleParts(0);
+            slimModel.setVisibleParts(0);
+            DrainedMCAVillagercorpseBlockEntityRenderer.renderDrainedBody(villager,slimModel, bModel, bufferSource, poseStack, packedLight, packedOverlay, bSize, hSize, wSize, face, 0 , false);
         } else {
-            this.model.setVisibleParts(0);
-        }
-        NativeImage defaultSkin = null;
-        try {
-            defaultSkin = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(DEFAULT_TEXTURE).open());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            model.setVisibleParts(0);
+            DrainedMCAVillagercorpseBlockEntityRenderer.renderDrainedBody(villager,model, bModel, bufferSource, poseStack, packedLight, packedOverlay, bSize, hSize, wSize, face, 0 , false);
         }
 
-        NativeImage chosenSkin = defaultSkin;
-
-        if (villager != null) {
-            NativeImage cachedTexture = ClientSkinCache.getImage(villager);
-
-            if (cachedTexture == null) {
-                if (!ClientSkinCache.hasRequested(villager)) {
-                    ClientSkinCache.markRequested(villager);
-                    MCAButcheryNetwork.requestVillagerSkin(villager);
-                }
-
-                poseStack.popPose();
-                return;
-            }
-
-            if(face != null && face != 0) {
-                try (NativeImage eyesImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID,"textures/entity/villager_eyes_" + face + ".png")).open())) {
-                    cachedTexture = CorpseTexture.blendEyes(cachedTexture, eyesImage);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            chosenSkin = cachedTexture;
-
-        }
-
-        CorpseTexture drainedTexture = new CorpseTexture("corpse_drained",chosenSkin,defaultSkin,defaultSkin,defaultSkin,false,true);
-
-        poseStack.translate(0f,0.006f,-0.0234f);
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(drainedTexture.getLocation()));
-
-        if(hSize != null && wSize != null) {
-            poseStack.translate(0.5F, 0F, 0.25F * wSize);
-            poseStack.scale(wSize,hSize,wSize);
-            poseStack.translate(-0.5F, 0F, -0.25F * wSize);
-        }
-
-        if(slim != null && slim){
-            slimModel.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
-        } else {
-            model.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
-        }
-        if(bSize != null) {
-            boolean boobsEnabled = Config.loadOrCreate().enableBoobs;
-            bModel.setVisible(bSize > 0 && boobsEnabled);
-            poseStack.translate(0.5F, 0.8F, 0.5F);
-            poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
-            poseStack.translate(-0.5f, -0.98F, -0.5f);
-            poseStack.translate(0f,0f, - 0.38f + (0.24f * bSize));
-            bModel.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
-        }
-        poseStack.popPose();
     }
 }

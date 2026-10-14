@@ -4,25 +4,21 @@ import com.mojang.logging.LogUtils;
 import de.bene2212.holdmyitemsnf.config.HoldMyItemsClientConfig;
 import net.dannyfather.mca_butchery.block.MCAButcheryBlocks;
 import net.dannyfather.mca_butchery.block.entity.MCAButcheryBlockEntities;
-import net.dannyfather.mca_butchery.block.entity.PikeBlockEntity;
 import net.dannyfather.mca_butchery.block.entity.models.*;
 import net.dannyfather.mca_butchery.block.entity.renderer.DrainedMCAVillagercorpseBlockEntityRenderer;
+import net.dannyfather.mca_butchery.block.entity.renderer.IronSpikeBlockEntityRenderer;
 import net.dannyfather.mca_butchery.block.entity.renderer.MCAVillagerHeadBlockEntityRenderer;
 import net.dannyfather.mca_butchery.block.entity.renderer.MCAVillagerCorpseBlockEntityRenderer;
-import net.dannyfather.mca_butchery.block.entity.renderer.PikeBlockEntityRenderer;
 import net.dannyfather.mca_butchery.client.*;
 import net.dannyfather.mca_butchery.config.MCAButcheryCommonConfig;
 import net.dannyfather.mca_butchery.item.MCAButcheryItems;
-import net.mcreator.butchery.configuration.ButcheryconfigConfiguration;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.ArmorStandRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -33,7 +29,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
@@ -70,7 +65,7 @@ public class MCAButchery {
 
 
 
-    @EventBusSubscriber(modid = MOD_ID,bus = EventBusSubscriber.Bus.MOD,value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MOD_ID,value = Dist.CLIENT)
     public static class ClientModEvents {
 
         private static MCAVillagerCorpseItemRenderer corpseItemRenderer;
@@ -147,8 +142,8 @@ public class MCAButchery {
             );
 
             event.registerBlockEntityRenderer(
-                    MCAButcheryBlockEntities.PIKE.get(),
-                    PikeBlockEntityRenderer::new
+                    MCAButcheryBlockEntities.IRON_SPIKE.get(),
+                    IronSpikeBlockEntityRenderer::new
             );
 
         }

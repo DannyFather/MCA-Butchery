@@ -51,7 +51,7 @@ public class DrainedMCAVillagercorpsebrokenProcedure {
         } else {
             if (!(entity instanceof Player _plr ? _plr.getAbilities().instabuild : false)) {
                 if (world instanceof ServerLevel _level) {
-                    ItemEntity entityToSpawn = new ItemEntity(_level, x, y, z, new ItemStack(ButcheryModItems.RAWHUMANMEAT.get()));
+                    ItemEntity entityToSpawn = new ItemEntity(_level, x, y, z, new ItemStack(ButcheryModItems.RAW_HUMAN_MEAT.get()));
                     entityToSpawn.setPickUpDelay(10);
                     _level.addFreshEntity(entityToSpawn);
                 }

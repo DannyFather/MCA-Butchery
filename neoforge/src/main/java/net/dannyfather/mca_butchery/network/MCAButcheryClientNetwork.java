@@ -184,7 +184,7 @@ public class MCAButcheryClientNetwork {
                 ResourceLocation location = ResourceLocation.fromNamespaceAndPath("mca_butchery","villager_skin/" + payload.uuid());
 
                 Minecraft.getInstance().getTextureManager().register(location, texture);
-                ClientSkinCache.put(payload.uuid(), location, image);
+                ClientSkinCache.put(payload.uuid().toString(), location, image);
 
             } catch (IOException e) {
                 e.printStackTrace();

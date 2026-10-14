@@ -18,7 +18,7 @@ public class MCAButcheryBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<MCAVillagerCorpseBlockEntity>> MCAVILLAGERCORPSE = register("villager_corpse", MCAButcheryBlocks.MCAVILLAGERCORPSE, MCAVillagerCorpseBlockEntity::new);
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DrainedMCAVillagerCorpseBlockEntity>> DRAINEDMCAVILLAGERCORPSE = register("drained_villager_corpse", MCAButcheryBlocks.DRAINEDMCAVILLAGERCORPSE, DrainedMCAVillagerCorpseBlockEntity::new);
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<MCAVillagerHeadBlockEntity>> MCAVILLAGERHEAD = register("villager_head", MCAButcheryBlocks.MCAVILLAGERHEAD, MCAVillagerHeadBlockEntity::new);
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PikeBlockEntity>> PIKE = register("pike", MCAButcheryBlocks.PIKE, PikeBlockEntity::new);
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<IronSpikeBlockEntity>> IRON_SPIKE = register("iron_spike", MCAButcheryBlocks.IRON_SPIKE, IronSpikeBlockEntity::new);
 
     // Start of user code block custom block entities
     // End of user code block custom block entities
@@ -31,6 +31,6 @@ public class MCAButcheryBlockEntities {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, MCAVILLAGERCORPSE.get(), SidedInvWrapper::new);
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DRAINEDMCAVILLAGERCORPSE.get(), SidedInvWrapper::new);
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, MCAVILLAGERHEAD.get(), SidedInvWrapper::new);
-        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, PIKE.get(), SidedInvWrapper::new);
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, IRON_SPIKE.get(), SidedInvWrapper::new);
     }
 }

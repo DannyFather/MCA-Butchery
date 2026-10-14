@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.dannyfather.mca_butchery.MCAButchery;
 import net.dannyfather.mca_butchery.block.entity.models.MCAVillagerHeadModel;
+import net.dannyfather.mca_butchery.block.entity.renderer.MCAVillagerHeadBlockEntityRenderer;
 import net.dannyfather.mca_butchery.item.MCAButcheryItems;
 import net.dannyfather.mca_butchery.network.MCAButcheryNetwork;
 import net.minecraft.client.model.PlayerModel;
@@ -41,35 +42,22 @@ public class MCAVillagerHeadHelmetRenderer extends RenderLayer<AbstractClientPla
         if(!stack.is(MCAButcheryItems.MCAVILLAGERHEAD.get())) {return;}
 
         UUID villager = stack.get(MCAButcheryItems.VILLAGER_UUID);
+        Integer face = stack.get(MCAButcheryItems.FACE);
+        Integer decayState = stack.get(MCAButcheryItems.DECAY_STATE);
+
         poseStack.pushPose();
 
 
         VertexConsumer vertexConsumer;
-
-        if(villager != null) {
-            ResourceLocation texture = ClientSkinCache.get(villager);
-            if(texture == null) {
-                if(!ClientSkinCache.hasRequested(villager)) {
-                    ClientSkinCache.markRequested(villager);
-                    MCAButcheryNetwork.requestVillagerSkin(villager);
-                }
-                poseStack.popPose();
-                return;
-            }
-            vertexConsumer = bufferSource.getBuffer(RenderType.entityCutout(texture));
-        } else {
-            vertexConsumer  = bufferSource.getBuffer(RenderType.entityCutout(DEFAULT_TEXTURE));
-        }
         poseStack.mulPose(Axis.YP.rotationDegrees(netHeadYaw));
-        poseStack.mulPose(Axis.XP.rotationDegrees(headPitch));
-
+        poseStack.translate(0f,livingEntity.isCrouching() ? 0.25f : 0f,0f);
+        poseStack.mulPose(Axis.XP.rotationDegrees((livingEntity.isVisuallyCrawling() || livingEntity.isSwimming()) ? -45 : headPitch));
 
         poseStack.scale(1.192F, 1.192F, 1.192F);
         poseStack.mulPose(Axis.XP.rotationDegrees(180f));
         poseStack.translate(-0.5f,0f,-0.5f);
 
-        model.renderToBuffer(poseStack, vertexConsumer,packedLight, OverlayTexture.NO_OVERLAY,0xFFFFFFFF);
 
-        poseStack.popPose();
+        MCAVillagerHeadBlockEntityRenderer.renderHead(villager,model, bufferSource,poseStack,packedLight, OverlayTexture.NO_OVERLAY, decayState, face );
     }
 }

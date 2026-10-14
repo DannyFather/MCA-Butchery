@@ -1,12 +1,16 @@
 package net.dannyfather.mca_butchery.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.mca.MCA;
 import net.conczin.mca.client.resources.SkinExporter;
 import net.conczin.mca.entity.VillagerEntityMCA;
 import net.dannyfather.mca_butchery.MCAButchery;
+import net.dannyfather.mca_butchery.config.MCAButcheryCommonConfig;
+import net.dannyfather.mca_butchery.network.MCAButcheryNetwork;
 import net.dannyfather.mca_butchery.network.UploadVillagerSkinPayload;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -16,16 +20,18 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.storage.LevelResource;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.UUID;
 
 public class CorpseTexture {
 
     private final ResourceLocation location;
     private final DynamicTexture dynamicTexture;
 
-    public CorpseTexture(String name,NativeImage base,NativeImage overlay,NativeImage mask,NativeImage overlayMask, boolean blood, boolean drained) {
+    public CorpseTexture(String name,NativeImage base,NativeImage overlay,NativeImage mask,NativeImage overlayMask, boolean blood, boolean drained, int decayState) {
         int width = base.getWidth();
         int height = base.getHeight();
         NativeImage result = new NativeImage(width, height, true);
@@ -43,6 +49,13 @@ public class CorpseTexture {
 
                 if(drained) {
                     resultColor = desaturate(baseColor, 0.6f);
+                }
+                if(decayState > 1) {
+                    if( y > 12 && y <= 14 && ((x > 8 && x <= 10) || (x > 12 && x <= 14) )) {
+                        resultColor = enPissify(resultColor);
+                    } else{
+                        resultColor = enGreenify(resultColor);
+                    }
                 }
                 if (blood) {
                     resultColor = blend(resultColor, overlayColor, maskAlpha, overlayMaskAmount);
@@ -130,8 +143,43 @@ public class CorpseTexture {
         return (a << 24) | (b << 16) | (g << 8) | r;
     }
 
+    private static int enGreenify(int color) {
+        int a = (color >> 24) & 0xFF;
+        int b = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int r = color & 0xFF;
+
+
+        r = Math.round(r * 0.7f);
+        g = Math.round(g + 0.9f);
+        b = Math.round(b * 0.6f);
+
+
+        return (a << 24) | (b << 16) | (g << 8) | r;
+    }
+
+    private static int enPissify(int color) {
+        int a = (color >> 24) & 0xFF;
+        int b = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int r = color & 0xFF;
+
+
+        r = (int) (r * 0.9f);
+        g = (int) (g + 0.8f);
+        b = (int) (b * 0.6f);
+
+
+        return (a << 24) | (b << 16) | (g << 8) | r;
+    }
+
+
+
     public ResourceLocation getLocation() {
         return location;
+    }
+    public DynamicTexture getDynamicTexture() {
+        return dynamicTexture;
     }
 
     public void close() {

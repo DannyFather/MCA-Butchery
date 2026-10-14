@@ -67,16 +67,26 @@ public class MCAVillagerCorpseBlockEntityRenderer implements BlockEntityRenderer
         VertexConsumer vertexConsumer;
 
         if(villager != null) {
-            ResourceLocation texture = ClientSkinCache.get(villager);
+            ResourceLocation texture = ClientSkinCache.get(villager.toString());
             if(texture == null) {
-                if(!ClientSkinCache.hasRequested(villager)) {
-                    ClientSkinCache.markRequested(villager);
+                if(!ClientSkinCache.hasRequested(villager.toString())) {
+                    ClientSkinCache.markRequested(villager.toString());
                     MCAButcheryNetwork.requestVillagerSkin(villager);
+                }
+                vertexConsumer  = bufferSource.getBuffer(RenderType.entityCutout(DEFAULT_TEXTURE));
+                switch (state) {
+                    case 0 -> {
+                        setSittingModel(poseStack, packedLight, packedOverlay, hSize, wSize, slim, vertexConsumer, slimModel, model);
+                    }
+
+                    case 1 -> {
+                        setHangingModel(poseStack, packedLight, packedOverlay, hSize, wSize, slim, vertexConsumer, slimHangingModel, hangingModel);
+                    }
                 }
                 poseStack.popPose();
                 return;
             }
-            NativeImage textureImage = ClientSkinCache.getImage(villager);
+            NativeImage textureImage = ClientSkinCache.getImage(villager.toString());
             if(face != 0 && MCAButcheryCommonConfig.GREY_EYES.get()) {
                 try {
                     NativeImage eyesImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "textures/entity/villager_eyes_" + face + ".png")).open());
@@ -102,15 +112,7 @@ public class MCAVillagerCorpseBlockEntityRenderer implements BlockEntityRenderer
 
         switch (state) {
             case 0 -> {
-                poseStack.translate(0.5F, 0F, 0.25F * wSize);
-                poseStack.scale(wSize,hSize,wSize);
-                poseStack.translate(-0.5F, 0F, -0.25F * wSize);
-                poseStack.translate(0f,0.006f,-0.0234f);
-                if (slim) {
-                    slimModel.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
-                } else {
-                    model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
-                }
+                setSittingModel(poseStack, packedLight, packedOverlay, hSize, wSize, slim, vertexConsumer, slimModel, model);
                 poseStack.translate(0.5F, 0.8F, 0.5F);
                 poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
                 poseStack.translate(-0.5f, -0.98F, -0.5f);
@@ -119,15 +121,7 @@ public class MCAVillagerCorpseBlockEntityRenderer implements BlockEntityRenderer
             }
 
             case 1 -> {
-                poseStack.translate(0.5F, 0.7F, 0.5F);
-                poseStack.scale(wSize,hSize,wSize);
-                poseStack.translate(-0.5F, -0.7F, -0.5F);
-                poseStack.translate(0f,0.006f,0.0075f);
-                if (slim) {
-                    slimHangingModel.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
-                } else {
-                    hangingModel.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
-                }
+                setHangingModel(poseStack, packedLight, packedOverlay, hSize, wSize, slim, vertexConsumer, slimHangingModel, hangingModel);
                 poseStack.translate(0.5F, 1F, 0.5F);
                 poseStack.scale(1f + (0.23f * bSize),0.6f + (0.7f * bSize),0.6f + (0.7f * bSize));
                 poseStack.translate(-0.5f, -1F, -0.49f);
@@ -141,6 +135,29 @@ public class MCAVillagerCorpseBlockEntityRenderer implements BlockEntityRenderer
 
     }
 
+    private static void setHangingModel(PoseStack poseStack, int packedLight, int packedOverlay, Float hSize, Float wSize, Boolean slim, VertexConsumer vertexConsumer, MCAVillagerCorpseHangingModelSlim slimHangingModel, MCAVillagerCorpseHangingModel hangingModel) {
+        poseStack.translate(0.5F, 0.7F, 0.5F);
+        poseStack.scale(wSize,hSize,wSize);
+        poseStack.translate(-0.5F, -0.7F, -0.5F);
+        poseStack.translate(0f,0.006f,0.0075f);
+        if (slim) {
+            slimHangingModel.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+        } else {
+            hangingModel.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
+        }
+    }
+
+    private static void setSittingModel(PoseStack poseStack, int packedLight, int packedOverlay, Float hSize, Float wSize, Boolean slim, VertexConsumer vertexConsumer, MCAVillagerCorpseModelSlim slimModel, MCAVillagerCorpseModel model) {
+        poseStack.translate(0.5F, 0F, 0.25F * wSize);
+        poseStack.scale(wSize,hSize,wSize);
+        poseStack.translate(-0.5F, 0F, -0.25F * wSize);
+        poseStack.translate(0f,0.006f,-0.0234f);
+        if (slim) {
+            slimModel.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
+        } else {
+            model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 0xFFFFFFFF);
+        }
+    }
 
 
 }

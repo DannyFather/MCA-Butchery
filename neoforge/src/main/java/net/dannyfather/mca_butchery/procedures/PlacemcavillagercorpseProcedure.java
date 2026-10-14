@@ -449,11 +449,11 @@ public class PlacemcavillagercorpseProcedure {
                     }
                     if (!(entity instanceof Player _plr ? _plr.getAbilities().instabuild : false)) {
                         if (entity instanceof Player _player) {
-                            if(_player.getMainHandItem().getItem().equals(MCAButcheryBlocks.MCAVILLAGERCORPSE.get().asItem())) {
+                            if(_player.getMainHandItem().getItem().equals(MCAButcheryBlocks.DRAINEDMCAVILLAGERCORPSE.get().asItem())) {
                                 ItemStack item = _player.getMainHandItem();
                                 item.shrink(1);
                                 _player.setItemInHand(InteractionHand.MAIN_HAND, item);
-                            } else if(_player.getOffhandItem().getItem().equals(MCAButcheryBlocks.MCAVILLAGERCORPSE.get().asItem())) {
+                            } else if(_player.getOffhandItem().getItem().equals(MCAButcheryBlocks.DRAINEDMCAVILLAGERCORPSE.get().asItem())) {
                                 ItemStack item = _player.getOffhandItem();
                                 item.shrink(1);
                                 _player.setItemInHand(InteractionHand.OFF_HAND, item);

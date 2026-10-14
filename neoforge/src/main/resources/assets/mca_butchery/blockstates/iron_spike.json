@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hasfenceabove=0": {
+      "model": "mca_butchery:block/iron_spike"
+    },
+    "hasfenceabove=1": {
+      "model": "mca_butchery:block/iron_spike_fence"
+    }
+  }
+}

@@ -127,16 +127,22 @@ public class MCAVillagerCorpseItemRenderer extends BlockEntityWithoutLevelRender
         VertexConsumer vertexConsumer;
 
         if(villager != null) {
-            ResourceLocation texture = ClientSkinCache.get(villager);
+            ResourceLocation texture = ClientSkinCache.get(villager.toString());
             if(texture == null) {
-                if(!ClientSkinCache.hasRequested(villager)) {
-                    ClientSkinCache.markRequested(villager);
+                if(!ClientSkinCache.hasRequested(villager.toString())) {
+                    ClientSkinCache.markRequested(villager.toString());
                     MCAButcheryNetwork.requestVillagerSkin(villager);
+                }
+                vertexConsumer  = bufferSource.getBuffer(RenderType.entityCutout(DEFAULT_TEXTURE));
+                if(slim != null && slim) {
+                    slimModel.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
+                } else {
+                    model.renderToBuffer(poseStack, vertexConsumer,packedLight,packedOverlay,0xFFFFFFFF);
                 }
                 poseStack.popPose();
                 return;
             }
-            NativeImage textureImage = ClientSkinCache.getImage(villager);
+            NativeImage textureImage = ClientSkinCache.getImage(villager.toString());
             if(face != null && face != 0 && MCAButcheryCommonConfig.GREY_EYES.get()) {
                 try {
                     NativeImage eyesImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResourceOrThrow(ResourceLocation.fromNamespaceAndPath(MCAButchery.MOD_ID, "textures/entity/villager_eyes_" + face + ".png")).open());

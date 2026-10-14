@@ -29,6 +29,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -38,12 +39,15 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -52,10 +56,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static net.dannyfather.mca_butchery.MCAButchery.LOGGER;
+
 
 @EventBusSubscriber(modid = MCAButchery.MOD_ID)
 public class MCAButcheryEvents {
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onEntityDeath(LivingDeathEvent event){
         LivingEntity entity = event.getEntity();
         DamageSource damageSource = event.getSource();
@@ -134,9 +140,6 @@ public class MCAButcheryEvents {
                                             pData.remove("tree_mother_UUID");
                                             pData.remove("tree_father_UUID");
                                             pData.remove("tree_spouse_UUID");
-                                            if (PlayerSaveData.get(player).getEntityData().getInt("playerModel") >= 1) {
-                                                pData.putString("custom_skin", player.getName().getString());
-                                            }
                                             VillagerEntityMCA pVillager = EntitiesMCA.FEMALE_VILLAGER.create(serverLevel);
                                             if (pData.getInt("gender") == 1) {
                                                 pVillager = EntitiesMCA.MALE_VILLAGER.create(serverLevel);
@@ -211,6 +214,20 @@ public class MCAButcheryEvents {
     }
 
     @SubscribeEvent
+    public static void  fallEvent(LivingFallEvent event) {
+        LivingEntity entity = event.getEntity();
+        int x = Mth.floor(entity.getX());
+        int y = Mth.floor(entity.getY()-0.2D);
+        int z = Mth.floor(entity.getZ());
+        BlockPos landingPos = new BlockPos(x,y,z);
+        BlockState blockState = entity.level().getBlockState(landingPos);
+        if(blockState.is(MCAButcheryBlocks.IRON_SPIKE.get())) {
+            float dist = event.getDistance();
+            event.setDistance(2f * dist);
+        }
+    }
+
+    @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         Player player = event.getEntity();
         if(player instanceof ServerPlayer serverPlayer) {
@@ -234,6 +251,10 @@ public class MCAButcheryEvents {
         if (event.getTabKey() == ButcheryModTabs.BUTCHERYCARCASSES.getKey()) {
             event.accept(MCAButcheryItems.MCAVILLAGERCORPSE);
             event.accept(MCAButcheryItems.DRAINEDMCAVILLAGERCORPSE);
+            event.accept(MCAButcheryItems.MCAVILLAGERHEAD);
+        }
+        if (event.getTabKey() == ButcheryModTabs.BUTCHERY_BLOCKS.getKey()) {
+            event.accept(MCAButcheryItems.IRON_SPIKE);
         }
     }
 

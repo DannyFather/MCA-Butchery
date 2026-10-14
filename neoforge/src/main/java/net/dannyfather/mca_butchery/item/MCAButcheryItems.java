@@ -38,7 +38,7 @@ public class MCAButcheryItems {
     public static final DeferredItem<Item> DRAINEDMCAVILLAGERCORPSE = block(MCAButcheryBlocks.DRAINEDMCAVILLAGERCORPSE, new Item.Properties().stacksTo(16));
     public static final DeferredItem<Item> MCAVILLAGERHEAD = REGISTRY.register("villager_head",
             () -> new MCAVillagerHeadItem(MCAButcheryBlocks.MCAVILLAGERHEAD.get(), new Item.Properties()));
-    public static final DeferredItem<Item> PIKE = block(MCAButcheryBlocks.PIKE, new Item.Properties());
+    public static final DeferredItem<Item> IRON_SPIKE = block(MCAButcheryBlocks.IRON_SPIKE, new Item.Properties());
 
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS =
             DeferredRegister.create(Registries.DATA_COMPONENT_TYPE,MCAButchery.MOD_ID);
@@ -68,6 +68,11 @@ public class MCAButcheryItems {
                     () -> DataComponentType.<Integer>builder().persistent(Codec.INT).build()
             );
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> DECAY_STATE =
+            DATA_COMPONENTS.register("decay_state",
+                    () -> DataComponentType.<Integer>builder().persistent(Codec.INT).build()
+            );
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SLIM =
             DATA_COMPONENTS.register("slim",
                     () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
@@ -77,7 +82,7 @@ public class MCAButcheryItems {
         return REGISTRY.register(block.getId().getPath(), () -> new BlockItem(block.get(), properties));
     }
 
-    @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(value = Dist.CLIENT)
     public static class ItemsClientSideHandler {
         @SubscribeEvent
         @OnlyIn(Dist.CLIENT)

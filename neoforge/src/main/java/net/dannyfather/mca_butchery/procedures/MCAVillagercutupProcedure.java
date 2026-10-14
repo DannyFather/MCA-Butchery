@@ -131,9 +131,7 @@ public class MCAVillagercutupProcedure {
                                 if(face != null) {
                                     item.set(MCAButcheryItems.FACE, face);
                                 }
-                                if(slim != null) {
-                                    item.set(MCAButcheryItems.SLIM, slim);
-                                }
+                                item.set(MCAButcheryItems.DECAY_STATE,0);
                                 Containers.dropItemStack(serverLevel, pos.getX(), pos.getY(), pos.getZ(), item);
                             }
                         }

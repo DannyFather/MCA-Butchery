@@ -9,12 +9,15 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -22,16 +25,17 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
-public class PikeBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer {
+public class IronSpikeBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer {
     private NonNullList<ItemStack> stacks = NonNullList.withSize(9, ItemStack.EMPTY);
     private UUID villagerUUID;
     private String customName;
     private Float wSize = 1f;
     private Float hSize = 1f;
     private Integer face = 0;
+    private Integer decayState = 0;
 
-    public PikeBlockEntity(BlockPos position, BlockState state) {
-        super(MCAButcheryBlockEntities.PIKE.get(), position, state);
+    public IronSpikeBlockEntity(BlockPos position, BlockState state) {
+        super(MCAButcheryBlockEntities.IRON_SPIKE.get(), position, state);
     }
 
 
@@ -99,6 +103,20 @@ public class PikeBlockEntity extends RandomizableContainerBlockEntity implements
         return this.face;
     }
 
+
+    public void setDecayState(Integer decayState) {
+        this.decayState = decayState;
+        setChanged();
+
+        if (this.level != null && !this.level.isClientSide) {
+            this.level.sendBlockUpdated(this.worldPosition,this.getBlockState(),this.getBlockState(),3);
+        }
+    }
+
+    public Integer getDecayState() {
+        return this.decayState;
+    }
+
     @Override
     public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookupProvider) {
         super.loadAdditional(compound, lookupProvider);
@@ -124,6 +142,10 @@ public class PikeBlockEntity extends RandomizableContainerBlockEntity implements
 
         if (compound.contains("Face")) {
             this.setFace(compound.getInt("Face"));
+        }
+
+        if (compound.contains("DecayState")) {
+            this.setDecayState(compound.getInt("DecayState"));
         }
     }
 
@@ -153,6 +175,10 @@ public class PikeBlockEntity extends RandomizableContainerBlockEntity implements
         if(this.getFace() != null) {
             compound.putInt("Face", this.getFace());
         }
+
+        if(this.getDecayState() != null) {
+            compound.putInt("DecayState", this.getDecayState());
+        }
     }
 
 
@@ -175,19 +201,30 @@ public class PikeBlockEntity extends RandomizableContainerBlockEntity implements
             stack.set(MCAButcheryItems.W_SIZE, this.getWidth());
         }
 
-
         if(this.getFace() != null) {
             stack.set(MCAButcheryItems.FACE, this.getFace());
+        }
+
+        if(this.getDecayState() != null) {
+            stack.set(MCAButcheryItems.DECAY_STATE, this.getDecayState());
+            if(decayState > 3) {
+                ItemStack skull = new ItemStack(Items.SKELETON_SKULL);
+                if (this.getItemName() != null) {
+                    String skullNameBase = Component.translatable("block.mca_butchery.villager_head_named").getString().replace("{VILLAGERNAME}", "");
+                    String skullName = this.getItemName().replace(skullNameBase, Component.translatable("block.mca_butchery.villager_skull_named").getString().replace("{VILLAGERNAME}", ""));
+                    skull.set(DataComponents.CUSTOM_NAME, Component.literal(skullName).withStyle(style -> style.withItalic(false)));
+                }
+                return skull;
+            }
         }
 
         return stack;
     }
 
 
-
     @Override
     public Component getDefaultName() {
-        return Component.literal("pike");
+        return Component.literal("iron_spike");
     }
 
     @Override
@@ -218,7 +255,7 @@ public class PikeBlockEntity extends RandomizableContainerBlockEntity implements
 
     @Override
     public Component getDisplayName() {
-        return Component.literal("Pike");
+        return Component.literal("Iron Spike");
     }
 
     @Override

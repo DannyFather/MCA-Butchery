@@ -127,6 +127,8 @@ public class MCAVillagerHeadBlock extends Block implements EntityBlock, SimpleWa
                 String itemName = head.getItemName();
                 Float hSize = head.getHeight();
                 Float wSize = head.getWidth();
+                Integer face = head.getFace();
+                Integer decayState = head.getDecayState();
                 if (itemName == null) {
                     itemName = Component.translatable("block.mca_butchery.villager_head").getString();
                 }
@@ -139,6 +141,12 @@ public class MCAVillagerHeadBlock extends Block implements EntityBlock, SimpleWa
                     }
                     if(wSize != null) {
                         headBE.setWidth(wSize);
+                    }
+                    if(face != null) {
+                        headBE.setFace(face);
+                    }
+                    if(decayState != null) {
+                        headBE.setDecayState(decayState);
                     }
                     ItemStack item = headBE.toItemStack();
                     Containers.dropItemStack(_level, pos.getX(), pos.getY(), pos.getZ(), item);
@@ -166,6 +174,8 @@ public class MCAVillagerHeadBlock extends Block implements EntityBlock, SimpleWa
                 Component itemComponent = stack.get(DataComponents.CUSTOM_NAME);
                 Float hSize = stack.get(MCAButcheryItems.H_SIZE);
                 Float wSize = stack.get(MCAButcheryItems.W_SIZE);
+                Integer face = stack.get(MCAButcheryItems.FACE);
+                Integer decayState = stack.get(MCAButcheryItems.DECAY_STATE);
 
                 if (uuid != null) {
                     head.setVillager(uuid);
@@ -178,6 +188,12 @@ public class MCAVillagerHeadBlock extends Block implements EntityBlock, SimpleWa
                 }
                 if(wSize != null) {
                     head.setWidth(wSize);
+                }
+                if(face != null) {
+                    head.setFace(face);
+                }
+                if(decayState != null) {
+                    head.setDecayState(decayState);
                 }
 
             }

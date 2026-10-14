@@ -48,7 +48,7 @@ subprojects {
             parchment("org.parchmentmc.data:parchment-${rootProject.minecraft_version}:2024.11.17@zip")
         }
         modImplementation(files("${rootProject.projectDir}/libs/mca-neoforge-7.7.36-beta.3+1.21.1.jar"))
-        modImplementation(files("${rootProject.projectDir}/libs/butchery-5.2-neoforge-1.21.1.jar"))
+        modImplementation(files("${rootProject.projectDir}/libs/butchery-5.3.1-neoforge-1.21.1.jar"))
         compileOnly(files("${rootProject.projectDir}/libs/holdmyitemsnf-1.21.1v2.1.jar"))
     }
 

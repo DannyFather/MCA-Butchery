@@ -3,5 +3,7 @@
   "block.mca_butchery.drained_villager_corpse": "Drained Corpse",
   "block.mca_butchery.villager_head": "Disembodied Head",
   "block.mca_butchery.villager_corpse_named": "{VILLAGERNAME}'s Corpse",
-  "block.mca_butchery.villager_head_named": "{VILLAGERNAME}'s Head"
+  "block.mca_butchery.villager_head_named": "{VILLAGERNAME}'s Head",
+  "block.mca_butchery.villager_skull_named": "{VILLAGERNAME}'s Skull",
+  "block.mca_butchery.iron_spike": "Iron Spike"
 }
